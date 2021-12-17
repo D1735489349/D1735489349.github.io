@@ -1,0 +1,1354 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+
+<head>
+    <meta charset="utf-8">
+    <meta name="keywords" content="关于promise的思考, 大飞哥的后花园">
+    <meta name="description" content="
+本篇内容是翻译自We have a problem with promises水平有限，希望大家查看原文，不吝赐教。
+
+各位JavaScript开发者，是时候承认我们对promise还是有些错误的认识，并不是说promise本身有问题。p">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="renderer" content="webkit|ie-stand|ie-comp">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="referrer" content="no-referrer-when-downgrade">
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+
+
+    <title>关于promise的思考 | 大飞哥的后花园</title>
+    <link rel="icon" type="image/png" href="/favicon.png">
+
+    <link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/materialize/materialize.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/aos/aos.css">
+    <link rel="stylesheet" type="text/css" href="/libs/animate/animate.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/lightGallery/css/lightgallery.min.css">
+    <link rel="stylesheet" type="text/css" href="/css/matery.css">
+    <link rel="stylesheet" type="text/css" href="/css/my.css">
+
+    <script src="/libs/jquery/jquery-3.6.0.min.js"></script>
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+
+
+
+<body>
+    <header class="navbar-fixed">
+    <nav id="headNav" class="bg-color nav-transparent">
+        <div id="navContainer" class="nav-wrapper container">
+            <div class="brand-logo">
+                <a href="/" class="waves-effect waves-light">
+                    
+                    <img src="/medias/logo.png" class="logo-img" alt="LOGO">
+                    
+                    <span class="logo-span">大飞哥的后花园</span>
+                </a>
+            </div>
+            
+
+<a href="#" data-target="mobile-nav" class="sidenav-trigger button-collapse"><i class="fas fa-bars"></i></a>
+<ul class="right nav-menu">
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/" class="waves-effect waves-light">
+      
+      <i class="fas fa-home" style="zoom: 0.6;"></i>
+      
+      <span>Index</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/tags" class="waves-effect waves-light">
+      
+      <i class="fas fa-tags" style="zoom: 0.6;"></i>
+      
+      <span>Tags</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/categories" class="waves-effect waves-light">
+      
+      <i class="fas fa-bookmark" style="zoom: 0.6;"></i>
+      
+      <span>Categories</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/archives" class="waves-effect waves-light">
+      
+      <i class="fas fa-archive" style="zoom: 0.6;"></i>
+      
+      <span>Archives</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/about" class="waves-effect waves-light">
+      
+      <i class="fas fa-user-circle" style="zoom: 0.6;"></i>
+      
+      <span>About</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/contact" class="waves-effect waves-light">
+      
+      <i class="fas fa-comments" style="zoom: 0.6;"></i>
+      
+      <span>Contact</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/friends" class="waves-effect waves-light">
+      
+      <i class="fas fa-address-book" style="zoom: 0.6;"></i>
+      
+      <span>Friends</span>
+    </a>
+    
+  </li>
+  
+  <li>
+    <a href="#searchModal" class="modal-trigger waves-effect waves-light">
+      <i id="searchIcon" class="fas fa-search" title="Search" style="zoom: 0.85;"></i>
+    </a>
+  </li>
+</ul>
+
+
+<div id="mobile-nav" class="side-nav sidenav">
+
+    <div class="mobile-head bg-color">
+        
+        <img src="/medias/logo.png" class="logo-img circle responsive-img">
+        
+        <div class="logo-name">大飞哥的后花园</div>
+        <div class="logo-desc">
+            
+            Never really desperate, only the lost of the soul.
+            
+        </div>
+    </div>
+
+    <ul class="menu-list mobile-menu-list">
+        
+        <li class="m-nav-item">
+	  
+		<a href="/" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-home"></i>
+			
+			Index
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/tags" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-tags"></i>
+			
+			Tags
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/categories" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-bookmark"></i>
+			
+			Categories
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/archives" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-archive"></i>
+			
+			Archives
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/about" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-user-circle"></i>
+			
+			About
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/contact" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-comments"></i>
+			
+			Contact
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/friends" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-address-book"></i>
+			
+			Friends
+		</a>
+          
+        </li>
+        
+        
+        <li><div class="divider"></div></li>
+        <li>
+            <a href="https://github.com/blinkfox/hexo-theme-matery" class="waves-effect waves-light" target="_blank">
+                <i class="fab fa-github-square fa-fw"></i>Fork Me
+            </a>
+        </li>
+        
+    </ul>
+</div>
+
+
+        </div>
+
+        
+            <style>
+    .nav-transparent .github-corner {
+        display: none !important;
+    }
+
+    .github-corner {
+        position: absolute;
+        z-index: 10;
+        top: 0;
+        right: 0;
+        border: 0;
+        transform: scale(1.1);
+    }
+
+    .github-corner svg {
+        color: #0f9d58;
+        fill: #fff;
+        height: 64px;
+        width: 64px;
+    }
+
+    .github-corner:hover .octo-arm {
+        animation: a 0.56s ease-in-out;
+    }
+
+    .github-corner .octo-arm {
+        animation: none;
+    }
+
+    @keyframes a {
+        0%,
+        to {
+            transform: rotate(0);
+        }
+        20%,
+        60% {
+            transform: rotate(-25deg);
+        }
+        40%,
+        80% {
+            transform: rotate(10deg);
+        }
+    }
+</style>
+
+<a href="https://github.com/blinkfox/hexo-theme-matery" class="github-corner tooltipped hide-on-med-and-down" target="_blank"
+   data-tooltip="Fork Me" data-position="left" data-delay="50">
+    <svg viewBox="0 0 250 250" aria-hidden="true">
+        <path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path>
+        <path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2"
+              fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path>
+        <path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z"
+              fill="currentColor" class="octo-body"></path>
+    </svg>
+</a>
+        
+    </nav>
+
+</header>
+
+    
+
+
+
+<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/2.jpg')">
+    <div class="container" style="right: 0px;left: 0px;">
+        <div class="row">
+            <div class="col s12 m12 l12">
+                <div class="brand">
+                    <h1 class="description center-align post-title">关于promise的思考</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<main class="post-container content">
+
+    
+    <link rel="stylesheet" href="/libs/tocbot/tocbot.css">
+<style>
+    #articleContent h1::before,
+    #articleContent h2::before,
+    #articleContent h3::before,
+    #articleContent h4::before,
+    #articleContent h5::before,
+    #articleContent h6::before {
+        display: block;
+        content: " ";
+        height: 100px;
+        margin-top: -100px;
+        visibility: hidden;
+    }
+
+    #articleContent :focus {
+        outline: none;
+    }
+
+    .toc-fixed {
+        position: fixed;
+        top: 64px;
+    }
+
+    .toc-widget {
+        width: 345px;
+        padding-left: 20px;
+    }
+
+    .toc-widget .toc-title {
+        padding: 35px 0 15px 17px;
+        font-size: 1.5rem;
+        font-weight: bold;
+        line-height: 1.5rem;
+    }
+
+    .toc-widget ol {
+        padding: 0;
+        list-style: none;
+    }
+
+    #toc-content {
+        padding-bottom: 30px;
+        overflow: auto;
+    }
+
+    #toc-content ol {
+        padding-left: 10px;
+    }
+
+    #toc-content ol li {
+        padding-left: 10px;
+    }
+
+    #toc-content .toc-link:hover {
+        color: #42b983;
+        font-weight: 700;
+        text-decoration: underline;
+    }
+
+    #toc-content .toc-link::before {
+        background-color: transparent;
+        max-height: 25px;
+
+        position: absolute;
+        right: 23.5vw;
+        display: block;
+    }
+
+    #toc-content .is-active-link {
+        color: #42b983;
+    }
+
+    #floating-toc-btn {
+        position: fixed;
+        right: 15px;
+        bottom: 76px;
+        padding-top: 15px;
+        margin-bottom: 0;
+        z-index: 998;
+    }
+
+    #floating-toc-btn .btn-floating {
+        width: 48px;
+        height: 48px;
+    }
+
+    #floating-toc-btn .btn-floating i {
+        line-height: 48px;
+        font-size: 1.4rem;
+    }
+</style>
+<div class="row">
+    <div id="main-content" class="col s12 m12 l9">
+        <!-- 文章内容详情 -->
+<div id="artDetail">
+    <div class="card">
+        <div class="card-content article-info">
+            <div class="row tag-cate">
+                <div class="col s7">
+                    
+                    <div class="article-tag">
+                        
+                            <a href="/tags/js/">
+                                <span class="chip bg-color">js</span>
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+                <div class="col s5 right-align">
+                    
+                    <div class="post-cate">
+                        <i class="fas fa-bookmark fa-fw icon-category"></i>
+                        
+                            <a href="/categories/js-basics/" class="post-category">
+                                js-basics
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+            </div>
+
+            <div class="post-info">
+                
+                <div class="post-date info-break-policy">
+                    <i class="far fa-calendar-minus fa-fw"></i>Publish Date:&nbsp;&nbsp;
+                    2017-11-28
+                </div>
+                
+
+                
+
+                
+
+                
+
+                
+            </div>
+        </div>
+        <hr class="clearfix">
+
+        
+
+        
+
+        <div class="card-content article-card-content">
+            <div id="articleContent">
+                <blockquote>
+<p>本篇内容是翻译自<a target="_blank" rel="noopener" href="https://pouchdb.com/2015/05/18/we-have-a-problem-with-promises.html">We have a problem with promises</a>水平有限，希望大家查看原文，不吝赐教。</p>
+</blockquote>
+<p>各位JavaScript开发者，是时候承认我们对<code>promise</code>还是有些错误的认识，并不是说<code>promise</code>本身有问题。<code>promise</code>遵循<code>promise A+</code>规范，设计出众。</p>
+<p>有一个大问题，就是在过去的一年里，我看到随着许多开发者对于<code>PouchDB API</code>或者其他promise封装api 的使用中,其实好多开发者在使用过程中并没有真正的理解。</p>
+<p>如果你觉得很难相信，请考虑一下我最近我在<a target="_blank" rel="noopener" href="https://twitter.com/nolanlawson/status/578948854411878400">Twitter</a>上发布的这个题：</p>
+<p>Q: 以下四种promises 有何不同 ？</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">doSomething().then(function () &#123;</span><br><span class="line">  return doSomethingElse();</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">doSomething().then(function () &#123;</span><br><span class="line">  doSomethingElse();</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">doSomething().then(doSomethingElse());</span><br><span class="line"></span><br><span class="line">doSomething().then(doSomethingElse);</span><br></pre></td></tr></table></figure>
+
+<p>如果你知道答案，那么恭喜你：你已经是一位promise 忍者了。你大可选择终止阅读本篇博客。</p>
+<p>对于其他99.99%在大厂的人，没有人能够回答解决我Twitter上的问题，这令我很吃惊，尽管这只是一个测试。</p>
+<p>答案就在文章的最后，但是首先我想探究一下为什么这个问题是是如此的棘手，以至于这么多不论新手还是专家被这个问题绊倒。我也会提供我的独到见解,一个小把戏，理解promise将不在话下，当然我也相信在你读了文章之后能够理解。</p>
+<p>开始之前，让我们挑战一下一些常见的promise设想</p>
+<h3 id="为什么出现promise"><a href="#为什么出现promise" class="headerlink" title="为什么出现promise"></a>为什么出现promise</h3><p>如果你读过关于promise的一些文章，你会经常看到可怕的回调占满屏幕，promise 的出现就是为了解决这个问题的，但是这不仅仅只是为了缩进好看。正如在演讲中提到的<a target="_blank" rel="noopener" href="http://youtu.be/hf1T_AONQJU">“走出回调地狱”</a>，回调的真正问题是它们剥夺了关键词<code>return</code>,<code>throw</code>。 相反，我们的程序的整个流程是基于副作用：一个功能耦合调用另一个。事实上,回调函数做的更加险恶:他们改变了我们通常理所当然认为的编程语言的堆栈。编写代码没有堆栈很像驾驶一辆没有刹车:你没有意识到你是多么的需要它,直到你用到时发现你够不到它。</p>
+<p>promise出现的关键就是我们使用异步回调的时候能够自然的使用语言的基础，比如 return，throw,以及堆栈。但是为了更好的使用promise在使用之前一定要搞清楚。</p>
+<h3 id="新手的问题"><a href="#新手的问题" class="headerlink" title="新手的问题"></a>新手的问题</h3><p>有些人试图使用<a target="_blank" rel="noopener" href="http://andyshora.com/promises-angularjs-explained-as-cartoon.html">卡通</a>的方式解释，或者以一种非常名词化的方式解释：“哦，这是你可以传递的，它代表了一个异步值”。我认为这样的解释并没有帮助理解。对于我来说，promise就是代码结构和流程控制。因此，我认为最好是列出一些常见的错误并说明如何修复它们。我把这些“菜鸟错误”解释为“你现在是菜鸟，小子，但你很快就会成为职业选手的。”</p>
+<p>快速的题外话：promise对于不同的人有不同的见解，但这篇文章的目的，我只想谈谈官方规则，如暴露在现代的浏览器window.promise，不是所有的浏览器都支持，但是你可以使用精巧的<a target="_blank" rel="noopener" href="https://github.com/calvinmetcalf/lie">lie</a>库做个兼容。</p>
+<h4 id="新手的问题-1：promise-金字塔"><a href="#新手的问题-1：promise-金字塔" class="headerlink" title="新手的问题#1：promise 金字塔"></a>新手的问题#1：promise 金字塔</h4><p>看人们如何使用pouchdb，许多都是基于promise的API，我看到很多可怜的promise模式。最常见的坏习惯是这个。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">remotedb.allDocs(&#123;</span><br><span class="line">  include_docs: true,</span><br><span class="line">  attachments: true</span><br><span class="line">&#125;).then(function (result) &#123;</span><br><span class="line">  var docs = result.rows;</span><br><span class="line">  docs.forEach(function(element) &#123;</span><br><span class="line">    localdb.put(element.doc).then(function(response) &#123;</span><br><span class="line">      alert(&quot;Pulled doc with id &quot; + element.doc._id + &quot; and added to local db.&quot;);</span><br><span class="line">    &#125;).catch(function (err) &#123;</span><br><span class="line">      if (err.name == &#x27;conflict&#x27;) &#123;</span><br><span class="line">        localdb.get(element.doc._id).then(function (resp) &#123;</span><br><span class="line">          localdb.remove(resp._id, resp._rev).then(function (resp) &#123;</span><br><span class="line">            .....</span><br><span class="line">          &#125;</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+<p>是的，你用promise又回到了回调，大材小用，建议你不要这样用。</p>
+<p>如果你认为这种错误只限于绝对的初学者，你会惊讶地发现我实际上是从<a target="_blank" rel="noopener" href="http://devblog.blackberry.com/2015/05/connecting-to-couchbase-with-pouchdb/">黑莓官方</a>开发者博客上获取了以上<a target="_blank" rel="noopener" href="https://github.com/blackberry/BB10-WebWorks-Community-Samples/blob/d6ee75fe23a10d2d3a036013b6b1a0c07a542099/pdbtest/www/js/index.js">代码</a> 旧的回调习惯难改啊!</p>
+<p>一个好的代码风格：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">remotedb.allDocs(...).then(function (resultOfAllDocs) &#123;</span><br><span class="line">  return localdb.put(...);</span><br><span class="line">&#125;).then(function (resultOfPut) &#123;</span><br><span class="line">  return localdb.get(...);</span><br><span class="line">&#125;).then(function (resultOfGet) &#123;</span><br><span class="line">  return localdb.put(...);</span><br><span class="line">&#125;).catch(function (err) &#123;</span><br><span class="line">  console.log(err);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<p>这才被称为promise的结构，也是promise强大之处。每一个函数只在前一个promise被解析返回新的promise对象时调用。</p>
+<h4 id="新手的问题-2：xxx-我如何在promise中使用forEach"><a href="#新手的问题-2：xxx-我如何在promise中使用forEach" class="headerlink" title="新手的问题#2：xxx,我如何在promise中使用forEach()"></a>新手的问题#2：xxx,我如何在promise中使用<code>forEach()</code></h4><p>这就是大多数人在理解promise时奔溃的地方，当他们想使用熟悉的<code>forEach()</code>循环时(或者是for循环，while循环)时就懵逼了。所以就会写出如下代码：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">// I want to remove() all docs</span><br><span class="line">db.allDocs(&#123;include_docs: true&#125;).then(function (result) &#123;</span><br><span class="line">  result.rows.forEach(function (row) &#123;</span><br><span class="line">    db.remove(row.doc);  </span><br><span class="line">  &#125;);</span><br><span class="line">&#125;).then(function () &#123;</span><br><span class="line">  // I naively believe all docs have been removed() now!</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>这段代码的问题是什么？ 问题就是第一个函数始终返回<code>undefined</code>，就意味着第二个函数不会去等待执行<code>db.remove()</code>操作，事实上没有任何等待，并且随机数量的文档被删除了！</p>
+<blockquote>
+<p>对于此处的问题写了个测试</p>
+</blockquote>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line">const db = &#123;</span><br><span class="line">  docs: [1, 2, 3, 4, 5, 6, 7],</span><br><span class="line">  allDocs() &#123;</span><br><span class="line">    const db = this</span><br><span class="line">    return new Promise((resolve, reject) =&gt; &#123;</span><br><span class="line">      setTimeout(() =&gt; &#123;</span><br><span class="line">        resolve(db.docs)</span><br><span class="line">      &#125;, 1000)</span><br><span class="line">    &#125;)</span><br><span class="line">  &#125;,</span><br><span class="line">  remove(item) &#123;</span><br><span class="line">    const db = this</span><br><span class="line">    return new Promise((resolve, reject) =&gt; &#123;</span><br><span class="line">      setTimeout(() =&gt; &#123;</span><br><span class="line">        const index = db.docs.indexOf(item)</span><br><span class="line">        if (index !== -1) &#123;</span><br><span class="line">          console.log(&#x27;删了一个&#x27;, db.docs[index])</span><br><span class="line">          db.docs.splice(index, 1)</span><br><span class="line">          resolve(true)</span><br><span class="line">        &#125; else &#123;</span><br><span class="line">          resolve(false)</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;, 1000)</span><br><span class="line">    &#125;)</span><br><span class="line">  &#125;,</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// I want to remove() all docs</span><br><span class="line">db</span><br><span class="line">  .allDocs(&#123; include_docs: true &#125;)</span><br><span class="line">  .then(function(result) &#123;</span><br><span class="line">    console.log(&#x27;result&#x27;, result)</span><br><span class="line">    result.forEach(function(row) &#123;</span><br><span class="line">      db.remove(row)</span><br><span class="line">    &#125;)</span><br><span class="line">  &#125;)</span><br><span class="line">  .then(function() &#123;</span><br><span class="line">    console.log(&#x27;// I naively believe all docs have been removed() now!&#x27;)</span><br><span class="line">  &#125;)</span><br></pre></td></tr></table></figure>
+
+<p>这是一个很阴险的bug,假设PouchDB很快的删除了文档更行了你的ui,可能你还没有意识到哪错了，错误可能会在奇数的情况下出现，也可能在某些浏览器中出现，你几乎无法调试。</p>
+<p>当你遇到循环的时候,这并不是你期望的结构，你需要<code>Promise.all()</code></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">db.allDocs(&#123;include_docs: true&#125;).then(function (result) &#123;</span><br><span class="line">  return Promise.all(result.rows.map(function (row) &#123;</span><br><span class="line">    return db.remove(row.doc);</span><br><span class="line">  &#125;));</span><br><span class="line">&#125;).then(function (arrayOfResults) &#123;</span><br><span class="line">  // All docs have really been removed() now!</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<p>发生了什么？基本上<code>Promise.all()</code>用一个promise数组作为输入, 然后它给了你另一个promise，只有当每一个promsie都resolve了，才执行resolve()方法。<br>等价于异步的for循环</p>
+<p><code>Promise.all()</code> 还将处理结果传递给下一个函数，是非常有用的，例如如果你是循环的使用PouchDB 的<code>get()</code>方法。还有一点是<code>all()</code>中如果有一个出现了<br>rejected状态，也会整体执行reject()方法。</p>
+<h4 id="新手的问题-3：忘记添加-catch"><a href="#新手的问题-3：忘记添加-catch" class="headerlink" title="新手的问题#3：忘记添加.catch()"></a>新手的问题#3：忘记添加<code>.catch()</code></h4><p>这是一个常见的错误，许多的开发者忘记添加<code>.catch()</code>方法就感觉他们特别的有信心他们的promise永远不会报错，不幸的是它们真的即使错了也不会在控制台输出，错误被淹没，调试异常痛苦。</p>
+<p>我养成了简单地在我的promise链中添加以下代码的习惯，避免这种可怕的场景。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">somePromise().then(function () &#123;</span><br><span class="line">  return anotherPromise();</span><br><span class="line">&#125;).then(function () &#123;</span><br><span class="line">  return yetAnotherPromise();</span><br><span class="line">&#125;).catch(console.log.bind(console)); // &lt;-- this is badass</span><br></pre></td></tr></table></figure>
+<p>即使你从不希望错误，还是要添加<code>catch()</code>，如果出错了，调试起来就轻松了。</p>
+<h4 id="新手的问题-4：使用-“deferred”"><a href="#新手的问题-4：使用-“deferred”" class="headerlink" title="新手的问题#4：使用 “deferred”"></a>新手的问题#4：使用 “deferred”</h4><h4 id="新手的问题-5：使用副作用代替返回"><a href="#新手的问题-5：使用副作用代替返回" class="headerlink" title="新手的问题#5：使用副作用代替返回"></a>新手的问题#5：使用副作用代替返回</h4><p>以下代码有何问题</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">somePromise().then(function () &#123;</span><br><span class="line">  someOtherPromise();</span><br><span class="line">&#125;).then(function () &#123;</span><br><span class="line">  // Gee, I hope someOtherPromise() has resolved!</span><br><span class="line">  // Spoiler alert: it hasn&#x27;t.</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<p>这是一个很好的例子来讨论以前你所不知道的promise的一些事情。</p>
+<p>说真的，这是一个奇怪的把戏，一旦你理解了它，就能避免我所说的所有错误。你准备好了吗？</p>
+<p>，但是具体是如何实践的呢？<br>每一个promise 都活给你一个<code>then()</code>方法(或者catch(),其实它是then(null, …)的语法糖)这里讨论<code>then()</code>方法：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">somePromise().then(function () &#123;</span><br><span class="line">  // I&#x27;m inside a then() function!</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<p>在这里我们能做什么？有三件事可做：</p>
+<ol>
+<li><code>return</code>另一个promise</li>
+<li><code>return</code>一个同步的值(或者undefined)</li>
+<li><code>throw</code>一个同步错误</li>
+</ol>
+<p>只要你理解了这三点，也就差不过多理解promise了</p>
+<h5 id="1-return另一个promise"><a href="#1-return另一个promise" class="headerlink" title="1.return另一个promise"></a>1.<code>return</code>另一个promise</h5><p>一个常见的例子：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">getUserByName(&#x27;nolan&#x27;).then(function (user) &#123;</span><br><span class="line">  return getUserAccountById(user.id);</span><br><span class="line">&#125;).then(function (userAccount) &#123;</span><br><span class="line">  // I got a user account!</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>这里我返回了一个promise, <code>return</code>是关键的，我能在下一个函数中接收到user 信息，但是我如果没有<code>return</code>，我将接受到一个 <code>undefined</code></p>
+<h5 id="2-return一个同步的值-或者undefined"><a href="#2-return一个同步的值-或者undefined" class="headerlink" title="2.return一个同步的值(或者undefined)"></a>2.<code>return</code>一个同步的值(或者undefined)</h5><p>返回一个<code>undefined</code>，但是返回一个同步的值是一种很好的方法替代返回promise,例如我们对user信息有一个缓存，我们可这样做:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">getUserByName(&#x27;nolan&#x27;).then(function (user) &#123;</span><br><span class="line">  if (inMemoryCache[user.id]) &#123;</span><br><span class="line">    return inMemoryCache[user.id];    // returning a synchronous value!</span><br><span class="line">  &#125;</span><br><span class="line">  return getUserAccountById(user.id); // returning a promise!</span><br><span class="line">&#125;).then(function (userAccount) &#123;</span><br><span class="line">  // I got a user account!</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>是不是很棒，第二个函数不用关心<code>userAccount</code>是同步还是异步获取的，第一个函数也可返回一个同步和异步的值。</p>
+<p>不幸的是，有一个不争的事实，即JavaScript中的非返回函数在技术上返回未定义，这意味着当您要返回某些东西时，很容易无意中引入副作用。鉴于这这原因，我经常会有一个个人习惯就是经常在<code>then()</code>函数中<code>return</code>或者<code>throw</code>，我建议你也这样做。</p>
+<h5 id="3-throw一个同步错误"><a href="#3-throw一个同步错误" class="headerlink" title="3.throw一个同步错误"></a>3.<code>throw</code>一个同步错误</h5><p>说道<code>throw</code>，这是promie更爽的一个地方，那么我们就以用户登出是要抛出一个错误为例：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">getUserByName(&#x27;nolan&#x27;).then(function (user) &#123;</span><br><span class="line">  if (user.isLoggedOut()) &#123;</span><br><span class="line">    throw new Error(&#x27;user logged out!&#x27;); // throwing a synchronous error!</span><br><span class="line">  &#125;</span><br><span class="line">  if (inMemoryCache[user.id]) &#123;</span><br><span class="line">    return inMemoryCache[user.id];       // returning a synchronous value!</span><br><span class="line">  &#125;</span><br><span class="line">  return getUserAccountById(user.id);    // returning a promise!</span><br><span class="line">&#125;).then(function (userAccount) &#123;</span><br><span class="line">  // I got a user account!</span><br><span class="line">&#125;).catch(function (err) &#123;</span><br><span class="line">  // Boo, I got an error!</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>我们的<code>catch()</code>方法将在用户登出是接收到一个同步错误，或者是任何promise rejected状态时接受到一个异步错误，它不关心到底是什么错误。</p>
+<p>这是特别有用的，应为在开发中可以定位错误。例如，当你在<code>then()</code>内部使用<code>JSON.parse()</code>它有可能抛出异常。使用常规的回调函数，错误很可能被掩埋， 但是使用promise，我们可以使用<code>catch()</code>方法捕获。</p>
+<h3 id="高级错误"><a href="#高级错误" class="headerlink" title="高级错误"></a>高级错误</h3><p>好了，现在你已经知道了promise的简单诀窍，让我们讨论一下非常见问题，总有一些特殊问题。</p>
+<p>这些问题我总结为‘高级问题’，因为我看到好多的开发者已经深入的使用promise了。但是我们如果想解决开篇提出的问题，还需要讨论一下。</p>
+<h4 id="高级错误-1-不懂-Promise-resolve"><a href="#高级错误-1-不懂-Promise-resolve" class="headerlink" title="高级错误#1:不懂 Promise.resolve()"></a>高级错误#1:不懂 <code>Promise.resolve()</code></h4><p>promise对于把同步代码封装为异步是非常有用的，如下展示的代码，但是你会发现你有点啰嗦了:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">new Promise(function (resolve, reject) &#123;</span><br><span class="line">  resolve(someSynchronousValue);</span><br><span class="line">&#125;).then(/* ... */);</span><br></pre></td></tr></table></figure>
+<p>你可以很简洁的使用<code>Promise.resolve()</code></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Promise.resolve(someSynchronousValue).then(/* ... */);</span><br></pre></td></tr></table></figure>
+
+<p>同样对于捕获同步代码的错误是非常有用，以至于我养成了如下返回promise API的习惯</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">function somePromiseAPI() &#123;</span><br><span class="line">  return Promise.resolve().then(function () &#123;</span><br><span class="line">    doSomethingThatMayThrow();</span><br><span class="line">    return &#x27;foo&#x27;;</span><br><span class="line">  &#125;).then(/* ... */);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>记住：抛出错误总比你debug错误来的方便，如果你使用<code>Promise.resolve()</code>,你总能在后边使用<code>catch()</code>捕获错误</p>
+<p>同样的有一个<code>Promise.reject()</code>方法可以使用它立即进入rejected状态</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Promise.reject(new Error(&#x27;some awful error&#x27;));</span><br></pre></td></tr></table></figure>
+
+<h4 id="高级错误-2-catch-不完全同等于then-null"><a href="#高级错误-2-catch-不完全同等于then-null" class="headerlink" title="高级错误#2: catch()不完全同等于then(null, ...)"></a>高级错误#2: <code>catch()</code>不完全同等于<code>then(null, ...)</code></h4><p>以下的代码中<code>catch</code>就是一层语法糖，所以二者是等价的：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">somePromise().catch(function (err) &#123;</span><br><span class="line">  // handle error</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">somePromise().then(null, function (err) &#123;</span><br><span class="line">  // handle error</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>然而下边的代码片段可不是等价的：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">somePromise().then(function () &#123;</span><br><span class="line">  return someOtherPromise();</span><br><span class="line">&#125;).catch(function (err) &#123;</span><br><span class="line">  // handle error</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">somePromise().then(function () &#123;</span><br><span class="line">  return someOtherPromise();</span><br><span class="line">&#125;, function (err) &#123;</span><br><span class="line">  // handle error</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>如果你想知道为什么二者不等价，思考一下如果第一个函数抛出错误会发生什么？</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">somePromise().then(function () &#123;</span><br><span class="line">  throw new Error(&#x27;oh noes&#x27;);</span><br><span class="line">&#125;).catch(function (err) &#123;</span><br><span class="line">  // I caught your error! :)</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">somePromise().then(function () &#123;</span><br><span class="line">  throw new Error(&#x27;oh noes&#x27;);</span><br><span class="line">&#125;, function (err) &#123;</span><br><span class="line">  // I didn&#x27;t catch your error! :(</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>结果证明，如果你使用<code>then(resolveHandler, rejectHandler)</code>这种模式，如果是<code>resolveHandler</code>本身抛出异常，<code>rejectHandler</code>是捕获不到的。</p>
+<p>鉴于这种原因，我个人建议不要使用<code>then()</code>方法的第二个参数，要始终使用<code>catch()</code>方法。例外情况是，当我编写异步 Mocha 测试时，我可能会编写一个测试来确保错误被抛出：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">it(&#x27;should throw an error&#x27;, function () &#123;</span><br><span class="line">  return doSomethingThatThrows().then(function () &#123;</span><br><span class="line">    throw new Error(&#x27;I expected an error!&#x27;);</span><br><span class="line">  &#125;, function (err) &#123;</span><br><span class="line">    should.exist(err);</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<h4 id="高级错误-3-promises-vs-promise-factories"><a href="#高级错误-3-promises-vs-promise-factories" class="headerlink" title="高级错误#3: promises vs promise factories"></a>高级错误#3: promises vs promise factories</h4><p>假设你想依次执行一系列的promise,就像<code>Promise.all</code>一样，但是并不是并行执行。</p>
+<p>你也许会很天真的这样写： </p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">function executeSequentially(promises) &#123;</span><br><span class="line">  var result = Promise.resolve();</span><br><span class="line">  promises.forEach(function (promise) &#123;</span><br><span class="line">    result = result.then(promise);</span><br><span class="line">  &#125;);</span><br><span class="line">  return result;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>很不幸的是，并不是你预期的执行。你传递给<code>executeSequentially</code>的promise依旧会并行执行。每个promise只要被创建就开始执行，所以你正真需要的是一个promise 数组工厂</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">function executeSequentially(promiseFactories) &#123;</span><br><span class="line">  var result = Promise.resolve();</span><br><span class="line">  promiseFactories.forEach(function (promiseFactory) &#123;</span><br><span class="line">    result = result.then(promiseFactory);</span><br><span class="line">  &#125;);</span><br><span class="line">  return result;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">function myPromiseFactory() &#123;</span><br><span class="line">  return somethingThatCreatesAPromise();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>…..未完，待续</p>
+
+                
+            </div>
+            <hr/>
+
+            
+
+    <div class="reprint" id="reprint-statement">
+        
+            <div class="reprint__author">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-user">
+                        Author:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    <a href="/about" rel="external nofollow noreferrer">杜宏飞</a>
+                </span>
+            </div>
+            <div class="reprint__type">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-link">
+                        Link:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    <a href="http://D1735489349.github.io/2017/11/28/blogSample/js-promise/">http://D1735489349.github.io/2017/11/28/blogSample/js-promise/</a>
+                </span>
+            </div>
+            <div class="reprint__notice">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-copyright">
+                        Reprint policy:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    All articles in this blog are used except for special statements
+                    <a href="https://creativecommons.org/licenses/by/4.0/deed.zh" rel="external nofollow noreferrer" target="_blank">CC BY 4.0</a>
+                    reprint policy. If reproduced, please indicate source
+                    <a href="/about" target="_blank">杜宏飞</a>
+                    !
+                </span>
+            </div>
+        
+    </div>
+
+    <script async defer>
+      document.addEventListener("copy", function (e) {
+        let toastHTML = '<span>Copied successfully, please follow the reprint policy of this article</span><button class="btn-flat toast-action" onclick="navToReprintStatement()" style="font-size: smaller">more</a>';
+        M.toast({html: toastHTML})
+      });
+
+      function navToReprintStatement() {
+        $("html, body").animate({scrollTop: $("#reprint-statement").offset().top - 80}, 800);
+      }
+    </script>
+
+
+
+            <div class="tag_share" style="display: block;">
+                <div class="post-meta__tag-list" style="display: inline-block;">
+                    
+                        <div class="article-tag">
+                            
+                                <a href="/tags/js/">
+                                    <span class="chip bg-color">js</span>
+                                </a>
+                            
+                        </div>
+                    
+                </div>
+                <div class="post_share" style="zoom: 80%; width: fit-content; display: inline-block; float: right; margin: -0.15rem 0;">
+                    <link rel="stylesheet" type="text/css" href="/libs/share/css/share.min.css">
+<div id="article-share">
+
+    
+    <div class="social-share" data-sites="twitter,facebook,google,qq,qzone,wechat,weibo,douban,linkedin" data-wechat-qrcode-helper="<p>微信扫一扫即可分享！</p>"></div>
+    <script src="/libs/share/js/social-share.min.js"></script>
+    
+
+    
+
+</div>
+
+                </div>
+            </div>
+            
+                <style>
+    #reward {
+        margin: 40px 0;
+        text-align: center;
+    }
+
+    #reward .reward-link {
+        font-size: 1.4rem;
+        line-height: 38px;
+    }
+
+    #reward .btn-floating:hover {
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2), 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    #rewardModal {
+        width: 320px;
+        height: 350px;
+    }
+
+    #rewardModal .reward-title {
+        margin: 15px auto;
+        padding-bottom: 5px;
+    }
+
+    #rewardModal .modal-content {
+        padding: 10px;
+    }
+
+    #rewardModal .close {
+        position: absolute;
+        right: 15px;
+        top: 15px;
+        color: rgba(0, 0, 0, 0.5);
+        font-size: 1.3rem;
+        line-height: 20px;
+        cursor: pointer;
+    }
+
+    #rewardModal .close:hover {
+        color: #ef5350;
+        transform: scale(1.3);
+        -moz-transform:scale(1.3);
+        -webkit-transform:scale(1.3);
+        -o-transform:scale(1.3);
+    }
+
+    #rewardModal .reward-tabs {
+        margin: 0 auto;
+        width: 210px;
+    }
+
+    .reward-tabs .tabs {
+        height: 38px;
+        margin: 10px auto;
+        padding-left: 0;
+    }
+
+    .reward-content ul {
+        padding-left: 0 !important;
+    }
+
+    .reward-tabs .tabs .tab {
+        height: 38px;
+        line-height: 38px;
+    }
+
+    .reward-tabs .tab a {
+        color: #fff;
+        background-color: #ccc;
+    }
+
+    .reward-tabs .tab a:hover {
+        background-color: #ccc;
+        color: #fff;
+    }
+
+    .reward-tabs .wechat-tab .active {
+        color: #fff !important;
+        background-color: #22AB38 !important;
+    }
+
+    .reward-tabs .alipay-tab .active {
+        color: #fff !important;
+        background-color: #019FE8 !important;
+    }
+
+    .reward-tabs .reward-img {
+        width: 210px;
+        height: 210px;
+    }
+</style>
+
+<div id="reward">
+    <a href="#rewardModal" class="reward-link modal-trigger btn-floating btn-medium waves-effect waves-light red">赏</a>
+
+    <!-- Modal Structure -->
+    <div id="rewardModal" class="modal">
+        <div class="modal-content">
+            <a class="close modal-close"><i class="fas fa-times"></i></a>
+            <h4 class="reward-title">你的赏识是我前进的动力</h4>
+            <div class="reward-content">
+                <div class="reward-tabs">
+                    <ul class="tabs row">
+                        <li class="tab col s6 alipay-tab waves-effect waves-light"><a href="#alipay">支付宝</a></li>
+                        <li class="tab col s6 wechat-tab waves-effect waves-light"><a href="#wechat">微 信</a></li>
+                    </ul>
+                    <div id="alipay">
+                        <img src="/medias/reward/alipay.jpg" class="reward-img" alt="支付宝打赏二维码">
+                    </div>
+                    <div id="wechat">
+                        <img src="/medias/reward/wechat.png" class="reward-img" alt="微信打赏二维码">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(function () {
+        $('.tabs').tabs();
+    });
+</script>
+
+            
+        </div>
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+<article id="prenext-posts" class="prev-next articles">
+    <div class="row article-row">
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge left-badge text-color">
+                <i class="fas fa-chevron-left"></i>&nbsp;Previous</div>
+            <div class="card">
+                <a href="/2017/12/29/blogSample/python-pandas-data-analysis/">
+                    <div class="card-image">
+                        
+                        
+                        <img src="/medias/featureimages/13.jpg" class="responsive-img" alt="使用Python pandas 中的统计">
+                        
+                        <span class="card-title">使用Python pandas 中的统计</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            
+                        
+                    </div>
+                    <div class="publish-info">
+                        <span class="publish-date">
+                            <i class="far fa-clock fa-fw icon-date"></i>2017-12-29
+                        </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/Python/" class="post-category">
+                                    Python
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/python-%E5%A4%A7%E6%95%B0%E6%8D%AE-%E6%95%B0%E6%8D%AE%E5%88%86%E6%9E%90/">
+                        <span class="chip bg-color">python 大数据 数据分析</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge right-badge text-color">
+                Next&nbsp;<i class="fas fa-chevron-right"></i>
+            </div>
+            <div class="card">
+                <a href="/2017/11/03/blogSample/data-analysis-web/">
+                    <div class="card-image">
+                        
+                        
+                        <img src="/medias/featureimages/10.jpg" class="responsive-img" alt="网站数据分析中 UV/IP/PV/VV感念">
+                        
+                        <span class="card-title">网站数据分析中 UV/IP/PV/VV感念</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            
+                        
+                    </div>
+                    <div class="publish-info">
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2017-11-03
+                            </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/data-analysis/" class="post-category">
+                                    data-analysis
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/data-analysis/">
+                        <span class="chip bg-color">data analysis</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+    </div>
+</article>
+
+</div>
+
+
+
+<!-- 代码块功能依赖 -->
+<script type="text/javascript" src="/libs/codeBlock/codeBlockFuction.js"></script>
+
+<!-- 代码语言 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeLang.js"></script>
+
+
+<!-- 代码块复制 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeCopy.js"></script>
+
+
+<!-- 代码块收缩 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeShrink.js"></script>
+
+
+    </div>
+    <div id="toc-aside" class="expanded col l3 hide-on-med-and-down">
+        <div class="toc-widget card" style="background-color: white;">
+            <div class="toc-title"><i class="far fa-list-alt"></i>&nbsp;&nbsp;TOC</div>
+            <div id="toc-content"></div>
+        </div>
+    </div>
+</div>
+
+<!-- TOC 悬浮按钮. -->
+
+<div id="floating-toc-btn" class="hide-on-med-and-down">
+    <a class="btn-floating btn-large bg-color">
+        <i class="fas fa-list-ul"></i>
+    </a>
+</div>
+
+
+<script src="/libs/tocbot/tocbot.min.js"></script>
+<script>
+    $(function () {
+        tocbot.init({
+            tocSelector: '#toc-content',
+            contentSelector: '#articleContent',
+            headingsOffset: -($(window).height() * 0.4 - 45),
+            collapseDepth: Number('0'),
+            headingSelector: 'h2, h3, h4'
+        });
+
+        // modify the toc link href to support Chinese.
+        let i = 0;
+        let tocHeading = 'toc-heading-';
+        $('#toc-content a').each(function () {
+            $(this).attr('href', '#' + tocHeading + (++i));
+        });
+
+        // modify the heading title id to support Chinese.
+        i = 0;
+        $('#articleContent').children('h2, h3, h4').each(function () {
+            $(this).attr('id', tocHeading + (++i));
+        });
+
+        // Set scroll toc fixed.
+        let tocHeight = parseInt($(window).height() * 0.4 - 64);
+        let $tocWidget = $('.toc-widget');
+        $(window).scroll(function () {
+            let scroll = $(window).scrollTop();
+            /* add post toc fixed. */
+            if (scroll > tocHeight) {
+                $tocWidget.addClass('toc-fixed');
+            } else {
+                $tocWidget.removeClass('toc-fixed');
+            }
+        });
+
+        
+        /* 修复文章卡片 div 的宽度. */
+        let fixPostCardWidth = function (srcId, targetId) {
+            let srcDiv = $('#' + srcId);
+            if (srcDiv.length === 0) {
+                return;
+            }
+
+            let w = srcDiv.width();
+            if (w >= 450) {
+                w = w + 21;
+            } else if (w >= 350 && w < 450) {
+                w = w + 18;
+            } else if (w >= 300 && w < 350) {
+                w = w + 16;
+            } else {
+                w = w + 14;
+            }
+            $('#' + targetId).width(w);
+        };
+
+        // 切换TOC目录展开收缩的相关操作.
+        const expandedClass = 'expanded';
+        let $tocAside = $('#toc-aside');
+        let $mainContent = $('#main-content');
+        $('#floating-toc-btn .btn-floating').click(function () {
+            if ($tocAside.hasClass(expandedClass)) {
+                $tocAside.removeClass(expandedClass).hide();
+                $mainContent.removeClass('l9');
+            } else {
+                $tocAside.addClass(expandedClass).show();
+                $mainContent.addClass('l9');
+            }
+            fixPostCardWidth('artDetail', 'prenext-posts');
+        });
+        
+    });
+</script>
+
+    
+
+</main>
+
+
+
+
+    <footer class="page-footer bg-color">
+    
+        <link rel="stylesheet" href="/libs/aplayer/APlayer.min.css">
+<style>
+    .aplayer .aplayer-lrc p {
+        
+        display: none;
+        
+        font-size: 12px;
+        font-weight: 700;
+        line-height: 16px !important;
+    }
+
+    .aplayer .aplayer-lrc p.aplayer-lrc-current {
+        
+        display: none;
+        
+        font-size: 15px;
+        color: #42b983;
+    }
+
+    
+    .aplayer.aplayer-fixed.aplayer-narrow .aplayer-body {
+        left: -66px !important;
+    }
+
+    .aplayer.aplayer-fixed.aplayer-narrow .aplayer-body:hover {
+        left: 0px !important;
+    }
+
+    
+</style>
+<div class="">
+    
+    <div class="row">
+        <meting-js class="col l8 offset-l2 m10 offset-m1 s12"
+                   server="netease"
+                   type="playlist"
+                   id="503838841"
+                   fixed='true'
+                   autoplay='false'
+                   theme='#42b983'
+                   loop='all'
+                   order='random'
+                   preload='auto'
+                   volume='0.7'
+                   list-folded='true'
+        >
+        </meting-js>
+    </div>
+</div>
+
+<script src="/libs/aplayer/APlayer.min.js"></script>
+<script src="/libs/aplayer/Meting.min.js"></script>
+
+    
+
+    <div class="container row center-align"
+         style="margin-bottom: 0px !important;">
+        <div class="col s12 m8 l8 copy-right">
+            Copyright&nbsp;&copy;
+            
+                <span id="year">2019-2021</span>
+            
+            <a href="/about" target="_blank">杜宏飞</a>
+            |&nbsp;Powered by&nbsp;<a href="https://hexo.io/" target="_blank">Hexo</a>
+            |&nbsp;Theme&nbsp;<a href="https://github.com/blinkfox/hexo-theme-matery" target="_blank">Matery</a>
+            <br>
+            
+            
+            
+                
+            
+            
+                <span id="busuanzi_container_site_pv">
+                &nbsp;|&nbsp;<i class="far fa-eye"></i>&nbsp;Total visits:&nbsp;
+                    <span id="busuanzi_value_site_pv" class="white-color"></span>
+            </span>
+            
+            
+                <span id="busuanzi_container_site_uv">
+                &nbsp;|&nbsp;<i class="fas fa-users"></i>&nbsp;Total visitors:&nbsp;
+                    <span id="busuanzi_value_site_uv" class="white-color"></span>
+            </span>
+            
+            <br>
+
+            <!-- 运行天数提醒. -->
+            
+            <br>
+            
+        </div>
+        <div class="col s12 m4 l4 social-link social-statis">
+    <a href="https://github.com/blinkfox" class="tooltipped" target="_blank" data-tooltip="访问我的GitHub" data-position="top" data-delay="50">
+        <i class="fab fa-github"></i>
+    </a>
+
+
+
+    <a href="mailto:1181062873@qq.com" class="tooltipped" target="_blank" data-tooltip="邮件联系我" data-position="top" data-delay="50">
+        <i class="fas fa-envelope-open"></i>
+    </a>
+
+
+
+
+
+
+
+    <a href="tencent://AddContact/?fromId=50&fromSubId=1&subcmd=all&uin=1181062873" class="tooltipped" target="_blank" data-tooltip="QQ联系我: 1181062873" data-position="top" data-delay="50">
+        <i class="fab fa-qq"></i>
+    </a>
+
+
+
+
+
+
+
+    <a href="/atom.xml" class="tooltipped" target="_blank" data-tooltip="RSS 订阅" data-position="top" data-delay="50">
+        <i class="fas fa-rss"></i>
+    </a>
+
+</div>
+    </div>
+</footer>
+
+<div class="progress-bar"></div>
+
+
+    <!-- 搜索遮罩框 -->
+<div id="searchModal" class="modal">
+    <div class="modal-content">
+        <div class="search-header">
+            <span class="title"><i class="fas fa-search"></i>&nbsp;&nbsp;Search</span>
+            <input type="search" id="searchInput" name="s" placeholder="Please enter a search keyword"
+                   class="search-input">
+        </div>
+        <div id="searchResult"></div>
+    </div>
+</div>
+
+<script type="text/javascript">
+$(function () {
+    var searchFunc = function (path, search_id, content_id) {
+        'use strict';
+        $.ajax({
+            url: path,
+            dataType: "xml",
+            success: function (xmlResponse) {
+                // get the contents from search data
+                var datas = $("entry", xmlResponse).map(function () {
+                    return {
+                        title: $("title", this).text(),
+                        content: $("content", this).text(),
+                        url: $("url", this).text()
+                    };
+                }).get();
+                var $input = document.getElementById(search_id);
+                var $resultContent = document.getElementById(content_id);
+                $input.addEventListener('input', function () {
+                    var str = '<ul class=\"search-result-list\">';
+                    var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+                    $resultContent.innerHTML = "";
+                    if (this.value.trim().length <= 0) {
+                        return;
+                    }
+                    // perform local searching
+                    datas.forEach(function (data) {
+                        var isMatch = true;
+                        var data_title = data.title.trim().toLowerCase();
+                        var data_content = data.content.trim().replace(/<[^>]+>/g, "").toLowerCase();
+                        var data_url = data.url;
+                        data_url = data_url.indexOf('/') === 0 ? data.url : '/' + data_url;
+                        var index_title = -1;
+                        var index_content = -1;
+                        var first_occur = -1;
+                        // only match artiles with not empty titles and contents
+                        if (data_title !== '' && data_content !== '') {
+                            keywords.forEach(function (keyword, i) {
+                                index_title = data_title.indexOf(keyword);
+                                index_content = data_content.indexOf(keyword);
+                                if (index_title < 0 && index_content < 0) {
+                                    isMatch = false;
+                                } else {
+                                    if (index_content < 0) {
+                                        index_content = 0;
+                                    }
+                                    if (i === 0) {
+                                        first_occur = index_content;
+                                    }
+                                }
+                            });
+                        }
+                        // show search results
+                        if (isMatch) {
+                            str += "<li><a href='" + data_url + "' class='search-result-title'>" + data_title + "</a>";
+                            var content = data.content.trim().replace(/<[^>]+>/g, "");
+                            if (first_occur >= 0) {
+                                // cut out 100 characters
+                                var start = first_occur - 20;
+                                var end = first_occur + 80;
+                                if (start < 0) {
+                                    start = 0;
+                                }
+                                if (start === 0) {
+                                    end = 100;
+                                }
+                                if (end > content.length) {
+                                    end = content.length;
+                                }
+                                var match_content = content.substr(start, end);
+                                // highlight all keywords
+                                keywords.forEach(function (keyword) {
+                                    var regS = new RegExp(keyword, "gi");
+                                    match_content = match_content.replace(regS, "<em class=\"search-keyword\">" + keyword + "</em>");
+                                });
+
+                                str += "<p class=\"search-result\">" + match_content + "...</p>"
+                            }
+                            str += "</li>";
+                        }
+                    });
+                    str += "</ul>";
+                    $resultContent.innerHTML = str;
+                });
+            }
+        });
+    };
+
+    searchFunc('/search.xml', 'searchInput', 'searchResult');
+});
+</script>
+
+    <!-- 回到顶部按钮 -->
+<div id="backTop" class="top-scroll">
+    <a class="btn-floating btn-large waves-effect waves-light" href="#!">
+        <i class="fas fa-arrow-up"></i>
+    </a>
+</div>
+
+
+    <script src="/libs/materialize/materialize.min.js"></script>
+    <script src="/libs/masonry/masonry.pkgd.min.js"></script>
+    <script src="/libs/aos/aos.js"></script>
+    <script src="/libs/scrollprogress/scrollProgress.min.js"></script>
+    <script src="/libs/lightGallery/js/lightgallery-all.min.js"></script>
+    <script src="/js/matery.js"></script>
+
+    
+
+    
+
+    <!-- 雪花特效 -->
+    
+
+    <!-- 鼠标星星特效 -->
+    
+
+     
+        <script src="https://ssl.captcha.qq.com/TCaptcha.js"></script>
+        <script src="/libs/others/TencentCaptcha.js"></script>
+        <button id="TencentCaptcha" data-appid="xxxxxxxxxx" data-cbfn="callback" type="button" hidden></button>
+    
+
+    <!-- Baidu Analytics -->
+
+    <!-- Baidu Push -->
+
+<script>
+    (function () {
+        var bp = document.createElement('script');
+        var curProtocol = window.location.protocol.split(':')[0];
+        if (curProtocol === 'https') {
+            bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+        } else {
+            bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+        }
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(bp, s);
+    })();
+</script>
+
+    
+    <script src="/libs/others/clicklove.js" async="async"></script>
+    
+    
+    <script async src="/libs/others/busuanzi.pure.mini.js"></script>
+    
+
+    
+
+    
+
+    <!--腾讯兔小巢-->
+    
+    
+
+    
+
+    
+
+    
+    <script src="/libs/instantpage/instantpage.js" type="module"></script>
+    
+
+</body>
+
+</html>

@@ -1,0 +1,1438 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+
+<head>
+    <meta charset="utf-8">
+    <meta name="keywords" content="操作系统的进程和线程, 大飞哥的后花园">
+    <meta name="description" content="[TOC]
+操作系统的进程和线程
+进程我们编写的代码只是一个存储在硬盘的静态文件，通过编译后就会生成二进制可执行文件，当我们运行这个可执行文件后，它会被装载到内存中，接着 CPU 会执行程序中的每一条指令，那么这个运行中的程序，就被称为「进">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="renderer" content="webkit|ie-stand|ie-comp">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="referrer" content="no-referrer-when-downgrade">
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+
+
+    <title>操作系统的进程和线程 | 大飞哥的后花园</title>
+    <link rel="icon" type="image/png" href="/favicon.png">
+
+    <link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/materialize/materialize.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/aos/aos.css">
+    <link rel="stylesheet" type="text/css" href="/libs/animate/animate.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/lightGallery/css/lightgallery.min.css">
+    <link rel="stylesheet" type="text/css" href="/css/matery.css">
+    <link rel="stylesheet" type="text/css" href="/css/my.css">
+
+    <script src="/libs/jquery/jquery-3.6.0.min.js"></script>
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+
+
+
+<body>
+    <header class="navbar-fixed">
+    <nav id="headNav" class="bg-color nav-transparent">
+        <div id="navContainer" class="nav-wrapper container">
+            <div class="brand-logo">
+                <a href="/" class="waves-effect waves-light">
+                    
+                    <img src="/medias/logo.png" class="logo-img" alt="LOGO">
+                    
+                    <span class="logo-span">大飞哥的后花园</span>
+                </a>
+            </div>
+            
+
+<a href="#" data-target="mobile-nav" class="sidenav-trigger button-collapse"><i class="fas fa-bars"></i></a>
+<ul class="right nav-menu">
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/" class="waves-effect waves-light">
+      
+      <i class="fas fa-home" style="zoom: 0.6;"></i>
+      
+      <span>Index</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/tags" class="waves-effect waves-light">
+      
+      <i class="fas fa-tags" style="zoom: 0.6;"></i>
+      
+      <span>Tags</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/categories" class="waves-effect waves-light">
+      
+      <i class="fas fa-bookmark" style="zoom: 0.6;"></i>
+      
+      <span>Categories</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/archives" class="waves-effect waves-light">
+      
+      <i class="fas fa-archive" style="zoom: 0.6;"></i>
+      
+      <span>Archives</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/about" class="waves-effect waves-light">
+      
+      <i class="fas fa-user-circle" style="zoom: 0.6;"></i>
+      
+      <span>About</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/contact" class="waves-effect waves-light">
+      
+      <i class="fas fa-comments" style="zoom: 0.6;"></i>
+      
+      <span>Contact</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/friends" class="waves-effect waves-light">
+      
+      <i class="fas fa-address-book" style="zoom: 0.6;"></i>
+      
+      <span>Friends</span>
+    </a>
+    
+  </li>
+  
+  <li>
+    <a href="#searchModal" class="modal-trigger waves-effect waves-light">
+      <i id="searchIcon" class="fas fa-search" title="Search" style="zoom: 0.85;"></i>
+    </a>
+  </li>
+</ul>
+
+
+<div id="mobile-nav" class="side-nav sidenav">
+
+    <div class="mobile-head bg-color">
+        
+        <img src="/medias/logo.png" class="logo-img circle responsive-img">
+        
+        <div class="logo-name">大飞哥的后花园</div>
+        <div class="logo-desc">
+            
+            Never really desperate, only the lost of the soul.
+            
+        </div>
+    </div>
+
+    <ul class="menu-list mobile-menu-list">
+        
+        <li class="m-nav-item">
+	  
+		<a href="/" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-home"></i>
+			
+			Index
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/tags" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-tags"></i>
+			
+			Tags
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/categories" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-bookmark"></i>
+			
+			Categories
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/archives" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-archive"></i>
+			
+			Archives
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/about" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-user-circle"></i>
+			
+			About
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/contact" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-comments"></i>
+			
+			Contact
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/friends" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-address-book"></i>
+			
+			Friends
+		</a>
+          
+        </li>
+        
+        
+        <li><div class="divider"></div></li>
+        <li>
+            <a href="https://github.com/blinkfox/hexo-theme-matery" class="waves-effect waves-light" target="_blank">
+                <i class="fab fa-github-square fa-fw"></i>Fork Me
+            </a>
+        </li>
+        
+    </ul>
+</div>
+
+
+        </div>
+
+        
+            <style>
+    .nav-transparent .github-corner {
+        display: none !important;
+    }
+
+    .github-corner {
+        position: absolute;
+        z-index: 10;
+        top: 0;
+        right: 0;
+        border: 0;
+        transform: scale(1.1);
+    }
+
+    .github-corner svg {
+        color: #0f9d58;
+        fill: #fff;
+        height: 64px;
+        width: 64px;
+    }
+
+    .github-corner:hover .octo-arm {
+        animation: a 0.56s ease-in-out;
+    }
+
+    .github-corner .octo-arm {
+        animation: none;
+    }
+
+    @keyframes a {
+        0%,
+        to {
+            transform: rotate(0);
+        }
+        20%,
+        60% {
+            transform: rotate(-25deg);
+        }
+        40%,
+        80% {
+            transform: rotate(10deg);
+        }
+    }
+</style>
+
+<a href="https://github.com/blinkfox/hexo-theme-matery" class="github-corner tooltipped hide-on-med-and-down" target="_blank"
+   data-tooltip="Fork Me" data-position="left" data-delay="50">
+    <svg viewBox="0 0 250 250" aria-hidden="true">
+        <path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path>
+        <path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2"
+              fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path>
+        <path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z"
+              fill="currentColor" class="octo-body"></path>
+    </svg>
+</a>
+        
+    </nav>
+
+</header>
+
+    
+
+
+
+<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/23.jpg')">
+    <div class="container" style="right: 0px;left: 0px;">
+        <div class="row">
+            <div class="col s12 m12 l12">
+                <div class="brand">
+                    <h1 class="description center-align post-title">操作系统的进程和线程</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<main class="post-container content">
+
+    
+    <link rel="stylesheet" href="/libs/tocbot/tocbot.css">
+<style>
+    #articleContent h1::before,
+    #articleContent h2::before,
+    #articleContent h3::before,
+    #articleContent h4::before,
+    #articleContent h5::before,
+    #articleContent h6::before {
+        display: block;
+        content: " ";
+        height: 100px;
+        margin-top: -100px;
+        visibility: hidden;
+    }
+
+    #articleContent :focus {
+        outline: none;
+    }
+
+    .toc-fixed {
+        position: fixed;
+        top: 64px;
+    }
+
+    .toc-widget {
+        width: 345px;
+        padding-left: 20px;
+    }
+
+    .toc-widget .toc-title {
+        padding: 35px 0 15px 17px;
+        font-size: 1.5rem;
+        font-weight: bold;
+        line-height: 1.5rem;
+    }
+
+    .toc-widget ol {
+        padding: 0;
+        list-style: none;
+    }
+
+    #toc-content {
+        padding-bottom: 30px;
+        overflow: auto;
+    }
+
+    #toc-content ol {
+        padding-left: 10px;
+    }
+
+    #toc-content ol li {
+        padding-left: 10px;
+    }
+
+    #toc-content .toc-link:hover {
+        color: #42b983;
+        font-weight: 700;
+        text-decoration: underline;
+    }
+
+    #toc-content .toc-link::before {
+        background-color: transparent;
+        max-height: 25px;
+
+        position: absolute;
+        right: 23.5vw;
+        display: block;
+    }
+
+    #toc-content .is-active-link {
+        color: #42b983;
+    }
+
+    #floating-toc-btn {
+        position: fixed;
+        right: 15px;
+        bottom: 76px;
+        padding-top: 15px;
+        margin-bottom: 0;
+        z-index: 998;
+    }
+
+    #floating-toc-btn .btn-floating {
+        width: 48px;
+        height: 48px;
+    }
+
+    #floating-toc-btn .btn-floating i {
+        line-height: 48px;
+        font-size: 1.4rem;
+    }
+</style>
+<div class="row">
+    <div id="main-content" class="col s12 m12 l9">
+        <!-- 文章内容详情 -->
+<div id="artDetail">
+    <div class="card">
+        <div class="card-content article-info">
+            <div class="row tag-cate">
+                <div class="col s7">
+                    
+                    <div class="article-tag">
+                        
+                            <a href="/tags/%E7%BA%BF%E7%A8%8B/">
+                                <span class="chip bg-color">线程</span>
+                            </a>
+                        
+                            <a href="/tags/%E8%BF%9B%E7%A8%8B/">
+                                <span class="chip bg-color">进程</span>
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+                <div class="col s5 right-align">
+                    
+                    <div class="post-cate">
+                        <i class="fas fa-bookmark fa-fw icon-category"></i>
+                        
+                            <a href="/categories/interview/" class="post-category">
+                                interview
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+            </div>
+
+            <div class="post-info">
+                
+                <div class="post-date info-break-policy">
+                    <i class="far fa-calendar-minus fa-fw"></i>Publish Date:&nbsp;&nbsp;
+                    2020-09-27
+                </div>
+                
+
+                
+
+                
+
+                
+
+                
+            </div>
+        </div>
+        <hr class="clearfix">
+
+        
+
+        
+
+        <div class="card-content article-card-content">
+            <div id="articleContent">
+                <p>[TOC]</p>
+<h1 id="操作系统的进程和线程"><a href="#操作系统的进程和线程" class="headerlink" title="操作系统的进程和线程"></a>操作系统的进程和线程</h1><p><img src="https://qingtong-1251156042.cos.ap-beijing.myqcloud.com/scxdoc/2020-09-27-054900.jpg"></p>
+<h2 id="进程"><a href="#进程" class="headerlink" title="进程"></a>进程</h2><p>我们编写的代码只是一个存储在硬盘的静态文件，通过编译后就会生成二进制可执行文件，当我们运行这个可执行文件后，它会被装载到内存中，接着 CPU 会执行程序中的每一条指令，那么这个运行中的程序，就被称为「进程」。<br>现在我们考虑有一个会读取硬盘文件数据的程序被执行了，那么当运行到读取文件的指令时，就会去从硬盘读取数据，但是硬盘的读写速度是非常慢的，那么在这个时候，如果 CPU 傻傻的等硬盘返回数据的话，那 CPU 的利用率是非常低的。<br>做个类比，你去煮开水时，你会傻傻的等水壶烧开吗？很明显，小孩也不会傻等。我们可以在水壶烧开之前去做其他事情。当水壶烧开了，我们自然就会听到“嘀嘀嘀”的声音，于是再把烧开的水倒入到水杯里就好了。<br>所以，当进程要从硬盘读取数据时，CPU 不需要阻塞等待数据的返回，而是去执行另外的进程。当硬盘数据返回时，CPU 会收到个中断，于是 CPU 再继续运行这个进程。</p>
+<p><img src="https://qingtong-1251156042.cos.ap-beijing.myqcloud.com/scxdoc/2020-09-27-055200.jpg"></p>
+<p>这种多个程序、交替执行的思想，就有 CPU 管理多个进程的初步想法。<br>对于一个支持多进程的系统，CPU 会从一个进程快速切换至另一个进程，其间每个进程各运行几十或几百个毫秒。<br>虽然单核的 CPU 在某一个瞬间，只能运行一个进程。但在 1 秒钟期间，它可能会运行多个进程，这样就产生并行的错觉，实际上这是并发。</p>
+<h3 id="并发和并行有什么区别？"><a href="#并发和并行有什么区别？" class="headerlink" title="并发和并行有什么区别？"></a>并发和并行有什么区别？</h3><p><img src="https://qingtong-1251156042.cos.ap-beijing.myqcloud.com/scxdoc/2020-09-27-055352.jpg"></p>
+<h3 id="进程与程序的关系的类比"><a href="#进程与程序的关系的类比" class="headerlink" title="进程与程序的关系的类比"></a>进程与程序的关系的类比</h3><p>到了晚饭时间，一对小情侣肚子都咕咕叫了，于是男生见机行事，就想给女生做晚饭，所以他就在网上找了辣子鸡的菜谱，接着买了一些鸡肉、辣椒、香料等材料，然后边看边学边做这道菜。</p>
+<p><img src="https://qingtong-1251156042.cos.ap-beijing.myqcloud.com/scxdoc/2020-09-27-055421.jpg"></p>
+<p>突然，女生说她想喝可乐，那么男生只好把做菜的事情暂停一下，并在手机菜谱标记做到哪一个步骤，把状态信息记录了下来。</p>
+<p>然后男生听从女生的指令，跑去下楼买了一瓶冰可乐后，又回到厨房继续做菜。</p>
+<p>这体现了，CPU 可以从一个进程（做菜）切换到另外一个进程（买可乐），在切换前必须要记录当前进程中运行的状态信息，以备下次切换回来的时候可以恢复执行。</p>
+<p>所以，可以发现进程有着「运行 - 暂停 - 运行」的活动规律。</p>
+<h3 id="进程的状态"><a href="#进程的状态" class="headerlink" title="进程的状态"></a>进程的状态</h3><p>在上面，我们知道了进程有着「运行 - 暂停 - 运行」的活动规律。一般说来，一个进程并不是自始至终连续不停地运行的，它与并发执行中的其他进程的执行是相互制约的。</p>
+<p>它有时处于运行状态，有时又由于某种原因而暂停运行处于等待状态，当使它暂停的原因消失后，它又进入准备运行状态。</p>
+<p>所以，在一个进程的活动期间至少具备三种基本状态，即运行状态、就绪状态、阻塞状态。</p>
+<p><img src="https://qingtong-1251156042.cos.ap-beijing.myqcloud.com/scxdoc/2020-09-27-055500.jpg"></p>
+<h3 id="上图中各个状态的意义："><a href="#上图中各个状态的意义：" class="headerlink" title="上图中各个状态的意义："></a>上图中各个状态的意义：</h3><p>运行状态（Runing）：该时刻进程占用 CPU；<br>就绪状态（Ready）：可运行，但因为其他进程正在运行而暂停停止；<br>阻塞状态（Blocked）：该进程正在等待某一事件发生（如等待输入/输出操作的完成）而暂时停止运行，这时，即使给它CPU控制权，它也无法运行；<br>当然，进程另外两个基本状态：</p>
+<p>创建状态（new）：进程正在被创建时的状态；<br>结束状态（Exit）：进程正在从系统中消失时的状态；<br>于是，一个完整的进程状态的变迁如下图：</p>
+<p><img src="https://qingtong-1251156042.cos.ap-beijing.myqcloud.com/scxdoc/2020-09-27-055519.jpg"></p>
+<h3 id="再来详细说明一下进程的状态变迁："><a href="#再来详细说明一下进程的状态变迁：" class="headerlink" title="再来详细说明一下进程的状态变迁："></a>再来详细说明一下进程的状态变迁：</h3><p>NULL -&gt; 创建状态：一个新进程被创建时的第一个状态；<br>创建状态 -&gt; 就绪状态：当进程被创建完成并初始化后，一切就绪准备运行时，变为就绪状态，这个过程是很快的；<br>就绪态 -&gt; 运行状态：处于就绪状态的进程被操作系统的进程调度器选中后，就分配给 CPU 正式运行该进程；<br>运行状态 -&gt; 结束状态：当进程已经运行完成或出错时，会被操作系统作结束状态处理；<br>运行状态 -&gt; 就绪状态：处于运行状态的进程在运行过程中，由于分配给它的运行时间片用完，操作系统会把该进程变为就绪态，接着从就绪态选中另外一个进程运行；<br>运行状态 -&gt; 阻塞状态：当进程请求某个事件且必须等待时，例如请求 I/O 事件；<br>阻塞状态 -&gt; 就绪状态：当进程要等待的事件完成时，它从阻塞状态变到就绪状态；<br>另外，还有一个状态叫挂起状态，它表示进程没有占有物理内存空间。这跟阻塞状态是不一样，阻塞状态是等待某个事件的返回。</p>
+<p>由于虚拟内存管理原因，进程的所使用的空间可能并没有映射到物理内存，而是在硬盘上，这时进程就会出现挂起状态，另外调用 sleep 也会被挂起。</p>
+<p><img src="https://qingtong-1251156042.cos.ap-beijing.myqcloud.com/scxdoc/2020-09-27-055535.jpg"></p>
+<h3 id="挂起状态可以分为两种："><a href="#挂起状态可以分为两种：" class="headerlink" title="挂起状态可以分为两种："></a>挂起状态可以分为两种：</h3><p>阻塞挂起状态：进程在外存（硬盘）并等待某个事件的出现；<br>就绪挂起状态：进程在外存（硬盘），但只要进入内存，即刻立刻运行；<br>这两种挂起状态加上前面的五种状态，就变成了七种状态变迁（留给我的颜色不多了），见如下图：</p>
+<p><img src="https://qingtong-1251156042.cos.ap-beijing.myqcloud.com/scxdoc/2020-09-27-055551.jpg"></p>
+<h3 id="进程的控制结构"><a href="#进程的控制结构" class="headerlink" title="进程的控制结构"></a>进程的控制结构</h3><p>在操作系统中，是用进程控制块（process control block，PCB）数据结构来描述进程的。</p>
+<p>那 PCB 是什么呢？打开知乎搜索你就会发现这个东西并不是那么简单。</p>
+<p>PCB 是进程存在的唯一标识，这意味着一个进程的存在，必然会有一个 PCB，如果进程消失了，那么 PCB 也会随之消失。</p>
+<h3 id="PCB-具体包含什么信息呢？"><a href="#PCB-具体包含什么信息呢？" class="headerlink" title="PCB 具体包含什么信息呢？"></a>PCB 具体包含什么信息呢？</h3><h3 id="进程描述信息："><a href="#进程描述信息：" class="headerlink" title="进程描述信息："></a>进程描述信息：</h3><p>进程标识符：标识各个进程，每个进程都有一个并且唯一的标识符；<br>用户标识符：进程归属的用户，用户标识符主要为共享和保护服务；</p>
+<h3 id="进程控制和管理信息："><a href="#进程控制和管理信息：" class="headerlink" title="进程控制和管理信息："></a>进程控制和管理信息：</h3><p>进程当前状态，如 new、ready、running、waiting 或 blocked 等；<br>进程优先级：进程抢占 CPU 时的优先级；</p>
+<h3 id="资源分配清单："><a href="#资源分配清单：" class="headerlink" title="资源分配清单："></a>资源分配清单：</h3><p>有关内存地址空间或虚拟地址空间的信息，所打开文件的列表和所使用的 I/O 设备信息。</p>
+<h3 id="CPU-相关信息："><a href="#CPU-相关信息：" class="headerlink" title="CPU 相关信息："></a>CPU 相关信息：</h3><p>CPU 中各个寄存器的值，当进程被切换时，CPU 的状态信息都会被保存在相应的 PCB 中，以便进程重新执行时，能从断点处继续执行。<br>可见，PCB 包含信息还是比较多的。</p>
+<h3 id="每个-PCB-是如何组织的呢？"><a href="#每个-PCB-是如何组织的呢？" class="headerlink" title="每个 PCB 是如何组织的呢？"></a>每个 PCB 是如何组织的呢？</h3><p>通常是通过链表的方式进行组织，把具有相同状态的进程链在一起，组成各种队列。比如：</p>
+<p>将所有处于就绪状态的进程链在一起，称为就绪队列；<br>把所有因等待某事件而处于等待状态的进程链在一起就组成各种阻塞队列；<br>另外，对于运行队列在单核 CPU 系统中则只有一个运行指针了，因为单核 CPU 在某个时间，只能运行一个程序。<br>那么，就绪队列和阻塞队列链表的组织形式如下图：</p>
+<p><img src="https://qingtong-1251156042.cos.ap-beijing.myqcloud.com/scxdoc/2020-09-27-055701.jpg"></p>
+<p>除了链接的组织方式，还有索引方式，它的工作原理：将同一状态的进程组织在一个索引表中，索引表项指向相应的 PCB，不同状态对应不同的索引表。</p>
+<p>一般会选择链表，因为可能面临进程创建，销毁等调度导致进程状态发生变化，所以链表能够更加灵活的插入和删除。</p>
+<h3 id="进程的控制"><a href="#进程的控制" class="headerlink" title="进程的控制"></a>进程的控制</h3><p>我们熟知了进程的状态变迁和进程的数据结构 PCB 后，再来看看进程的创建、终止、阻塞、唤醒的过程，这些过程也就是进程的控制。</p>
+<h4 id="01-创建进程"><a href="#01-创建进程" class="headerlink" title="01 创建进程"></a>01 创建进程</h4><p>操作系统允许一个进程创建另一个进程，而且允许子进程继承父进程所拥有的资源，当子进程被终止时，其在父进程处继承的资源应当还给父进程。同时，终止父进程时同时也会终止其所有的子进程。</p>
+<p>创建进程的过程如下：</p>
+<p>为新进程分配一个唯一的进程标识号，并申请一个空白的 PCB，PCB 是有限的，若申请失败则创建失败；<br>为进程分配资源，此处如果资源不足，进程就会进入等待状态，以等待资源；<br>初始化 PCB；<br>如果进程的调度队列能够接纳新进程，那就将进程插入到就绪队列，等待被调度运行；</p>
+<h4 id="02-终止进程"><a href="#02-终止进程" class="headerlink" title="02 终止进程"></a>02 终止进程</h4><p>进程可以有 3 种终止方式：正常结束、异常结束以及外界干预（信号 kill 掉）。</p>
+<p>终止进程的过程如下：</p>
+<p>查找需要终止的进程的 PCB；<br>如果处于执行状态，则立即终止该进程的执行，然后将 CPU 资源分配给其他进程；<br>如果其还有子进程，则应将其所有子进程终止；<br>将该进程所拥有的全部资源都归还给父进程或操作系统；<br>将其从 PCB 所在队列中删除；</p>
+<h4 id="03-阻塞进程"><a href="#03-阻塞进程" class="headerlink" title="03 阻塞进程"></a>03 阻塞进程</h4><p>当进程需要等待某一事件完成时，它可以调用阻塞语句把自己阻塞等待。而一旦被阻塞等待，它只能由另一个进程唤醒。</p>
+<p>阻塞进程的过程如下：</p>
+<p>找到将要被阻塞进程标识号对应的 PCB；<br>如果该进程为运行状态，则保护其现场，将其状态转为阻塞状态，停止运行；<br>将该 PCB 插入的阻塞队列中去；</p>
+<h4 id="04-唤醒进程"><a href="#04-唤醒进程" class="headerlink" title="04 唤醒进程"></a>04 唤醒进程</h4><p>进程由「运行」转变为「阻塞」状态是由于进程必须等待某一事件的完成，所以处于阻塞状态的进程是绝对不可能叫醒自己的。</p>
+<p>如果某进程正在等待 I/O 事件，需由别的进程发消息给它，则只有当该进程所期待的事件出现时，才由发现者进程用唤醒语句叫醒它。</p>
+<p>唤醒进程的过程如下：</p>
+<p>在该事件的阻塞队列中找到相应进程的 PCB；<br>将其从阻塞队列中移出，并置其状态为就绪状态；<br>把该 PCB 插入到就绪队列中，等待调度程序调度；<br>进程的阻塞和唤醒是一对功能相反的语句，如果某个进程调用了阻塞语句，则必有一个与之对应的唤醒语句。</p>
+<h3 id="进程的上下文切换"><a href="#进程的上下文切换" class="headerlink" title="进程的上下文切换"></a>进程的上下文切换</h3><p>各个进程之间是共享 CPU 资源的，在不同的时候进程之间需要切换，让不同的进程可以在 CPU 执行，那么这个一个进程切换到另一个进程运行，称为进程的上下文切换。</p>
+<p>在详细说进程上下文切换前，我们先来看看 CPU 上下文切换<br>大多数操作系统都是多任务，通常支持大于 CPU 数量的任务同时运行。实际上，这些任务并不是同时运行的，只是因为系统在很短的时间内，让各个任务分别在 CPU 运行，于是就造成同时运行的错觉。</p>
+<p>任务是交给 CPU 运行的，那么在每个任务运行前，CPU 需要知道任务从哪里加载，又从哪里开始运行。</p>
+<p>所以，操作系统需要事先帮 CPU 设置好 CPU 寄存器和程序计数器。</p>
+<p>CPU 寄存器是 CPU 内部一个容量小，但是速度极快的内存（缓存）。我举个例子，寄存器像是你的口袋，内存像你的书包，硬盘则是你家里的柜子，如果你的东西存放到口袋，那肯定是比你从书包或家里柜子取出来要快的多。</p>
+<p>再来，程序计数器则是用来存储 CPU 正在执行的指令位置、或者即将执行的下一条指令位置。</p>
+<p>所以说，CPU 寄存器和程序计数是 CPU 在运行任何任务前，所必须依赖的环境，这些环境就叫做 CPU 上下文。</p>
+<p>既然知道了什么是 CPU 上下文，那理解 CPU 上下文切换就不难了。</p>
+<p>CPU 上下文切换就是先把前一个任务的 CPU 上下文（CPU 寄存器和程序计数器）保存起来，然后加载新任务的上下文到这些寄存器和程序计数器，最后再跳转到程序计数器所指的新位置，运行新任务。</p>
+<p>系统内核会存储保持下来的上下文信息，当此任务再次被分配给 CPU 运行时，CPU 会重新加载这些上下文，这样就能保证任务原来的状态不受影响，让任务看起来还是连续运行。</p>
+<p>上面说到所谓的「任务」，主要包含进程、线程和中断。所以，可以根据任务的不同，把 CPU 上下文切换分成：进程上下文切换、线程上下文切换和中断上下文切换。</p>
+<h3 id="进程的上下文切换到底是切换什么呢？"><a href="#进程的上下文切换到底是切换什么呢？" class="headerlink" title="进程的上下文切换到底是切换什么呢？"></a>进程的上下文切换到底是切换什么呢？</h3><p>进程是由内核管理和调度的，所以进程的切换只能发生在内核态。</p>
+<p>所以，进程的上下文切换不仅包含了虚拟内存、栈、全局变量等用户空间的资源，还包括了内核堆栈、寄存器等内核空间的资源。</p>
+<p>通常，会把交换的信息保存在进程的 PCB，当要运行另外一个进程的时候，我们需要从这个进程的 PCB 取出上下文，然后恢复到 CPU 中，这使得这个进程可以继续执行，如下图所示：</p>
+<p><img src="https://qingtong-1251156042.cos.ap-beijing.myqcloud.com/scxdoc/2020-09-27-055823.jpg"></p>
+<p>大家需要注意，进程的上下文开销是很关键的，我们希望它的开销越小越好，这样可以使得进程可以把更多时间花费在执行程序上，而不是耗费在上下文切换。</p>
+<h3 id="发生进程上下文切换有哪些场景？"><a href="#发生进程上下文切换有哪些场景？" class="headerlink" title="发生进程上下文切换有哪些场景？"></a>发生进程上下文切换有哪些场景？</h3><p>为了保证所有进程可以得到公平调度，CPU 时间被划分为一段段的时间片，这些时间片再被轮流分配给各个进程。这样，当某个进程的时间片耗尽了，就会被系统挂起，切换到其它正在等待 CPU 的进程运行；<br>进程在系统资源不足（比如内存不足）时，要等到资源满足后才可以运行，这个时候进程也会被挂起，并由系统调度其他进程运行；<br>当进程通过睡眠函数 sleep 这样的方法将自己主动挂起时，自然也会重新调度；<br>当有优先级更高的进程运行时，为了保证高优先级进程的运行，当前进程会被挂起，由高优先级进程来运行；<br>发生硬件中断时，CPU 上的进程会被中断挂起，转而执行内核中的中断服务程序；<br>以上，就是发生进程上下文切换的常见场景了。</p>
+<h2 id="线程"><a href="#线程" class="headerlink" title="线程"></a>线程</h2><p>在早期的操作系统中都是以进程作为独立运行的基本单位，直到后面，计算机科学家们又提出了更小的能独立运行的基本单位，也就是线程。</p>
+<h3 id="为什么使用线程？"><a href="#为什么使用线程？" class="headerlink" title="为什么使用线程？"></a>为什么使用线程？</h3><p>我们举个例子，假设你要编写一个视频播放器软件，那么该软件功能的核心模块有三个：</p>
+<p>从视频文件当中读取数据；<br>对读取的数据进行解压缩；<br>把解压缩后的视频数据播放出来；</p>
+<h4 id="对于单进程的实现方式，我想大家都会是以下这个方式："><a href="#对于单进程的实现方式，我想大家都会是以下这个方式：" class="headerlink" title="对于单进程的实现方式，我想大家都会是以下这个方式："></a>对于单进程的实现方式，我想大家都会是以下这个方式：</h4><p><img src="https://qingtong-1251156042.cos.ap-beijing.myqcloud.com/scxdoc/2020-09-27-055856.jpg"></p>
+<p>对于单进程的这种方式，存在以下问题：</p>
+<p>播放出来的画面和声音会不连贯，因为当 CPU 能力不够强的时候，Read  的时候可能进程就等在这了，这样就会导致等半天才进行数据解压和播放；<br>各个函数之间不是并发执行，影响资源的使用效率；</p>
+<h4 id="那改进成多进程的方式："><a href="#那改进成多进程的方式：" class="headerlink" title="那改进成多进程的方式："></a>那改进成多进程的方式：</h4><p><img src="https://qingtong-1251156042.cos.ap-beijing.myqcloud.com/scxdoc/2020-09-27-055916.jpg"></p>
+<h3 id="对于多进程的这种方式，依然会存在问题："><a href="#对于多进程的这种方式，依然会存在问题：" class="headerlink" title="对于多进程的这种方式，依然会存在问题："></a>对于多进程的这种方式，依然会存在问题：</h3><h4 id="进程之间如何通信，共享数据？"><a href="#进程之间如何通信，共享数据？" class="headerlink" title="进程之间如何通信，共享数据？"></a>进程之间如何通信，共享数据？</h4><p>维护进程的系统开销较大，如创建进程时，分配资源、建立 PCB；终止进程时，回收资源、撤销 PCB；进程切换时，保存当前进程的状态信息；<br>那到底如何解决呢？需要有一种新的实体，满足以下特性：</p>
+<h4 id="实体之间可以并发运行；"><a href="#实体之间可以并发运行；" class="headerlink" title="实体之间可以并发运行；"></a>实体之间可以并发运行；</h4><p>实体之间共享相同的地址空间；<br>这个新的实体，就是线程( Thread )，线程之间可以并发运行且共享相同的地址空间。</p>
+<h3 id="什么是线程？"><a href="#什么是线程？" class="headerlink" title="什么是线程？"></a>什么是线程？</h3><p>线程是进程当中的一条执行流程。</p>
+<p>同一个进程内多个线程之间可以共享代码段、数据段、打开的文件等资源，但每个线程都有独立一套的寄存器和栈，这样可以确保线程的控制流是相对独立的。</p>
+<p><img src="https://qingtong-1251156042.cos.ap-beijing.myqcloud.com/scxdoc/2020-09-27-055942.jpg"></p>
+<h3 id="线程的优缺点？"><a href="#线程的优缺点？" class="headerlink" title="线程的优缺点？"></a>线程的优缺点？</h3><h4 id="线程的优点："><a href="#线程的优点：" class="headerlink" title="线程的优点："></a>线程的优点：</h4><p>一个进程中可以同时存在多个线程；<br>各个线程之间可以并发执行；<br>各个线程之间可以共享地址空间和文件等资源；</p>
+<h4 id="线程的缺点："><a href="#线程的缺点：" class="headerlink" title="线程的缺点："></a>线程的缺点：</h4><p>当进程中的一个线程奔溃时，会导致其所属进程的所有线程奔溃。<br>举个例子，对于游戏的用户设计，则不应该使用多线程的方式，否则一个用户挂了，会影响其他同个进程的线程。</p>
+<h2 id="线程与进程的比较"><a href="#线程与进程的比较" class="headerlink" title="线程与进程的比较"></a>线程与进程的比较</h2><h3 id="线程与进程的比较如下："><a href="#线程与进程的比较如下：" class="headerlink" title="线程与进程的比较如下："></a>线程与进程的比较如下：</h3><p>进程是资源（包括内存、打开的文件等）分配的单位，线程是 CPU 调度的单位；<br>进程拥有一个完整的资源平台，而线程只独享必不可少的资源，如寄存器和栈；<br>线程同样具有就绪、阻塞、执行三种基本状态，同样具有状态之间的转换关系；<br>线程能减少并发执行的时间和空间开销；<br>对于，线程相比进程能减少开销，体现在：</p>
+<p>线程的创建时间比进程快，因为进程在创建的过程中，还需要资源管理信息，比如内存管理信息、文件管理信息，而线程在创建的过程中，不会涉及这些资源管理信息，而是共享它们；<br>线程的终止时间比进程快，因为线程释放的资源相比进程少很多；<br>同一个进程内的线程切换比进程切换快，因为线程具有相同的地址空间（虚拟内存共享），这意味着同一个进程的线程都具有同一个页表，那么在切换的时候不需要切换页表。而对于进程之间的切换，切换的时候要把页表给切换掉，而页表的切换过程开销是比较大的；<br>由于同一进程的各线程间共享内存和文件资源，那么在线程之间数据传递的时候，就不需要经过内核了，这就使得线程之间的数据交互效率更高了；<br>所以，线程比进程不管是时间效率，还是空间效率都要高。</p>
+<h3 id="线程的上下文切换"><a href="#线程的上下文切换" class="headerlink" title="线程的上下文切换"></a>线程的上下文切换</h3><p>在前面我们知道了，线程与进程最大的区别在于：线程是调度的基本单位，而进程则是资源拥有的基本单位。</p>
+<p>所以，所谓操作系统的任务调度，实际上的调度对象是线程，而进程只是给线程提供了虚拟内存、全局变量等资源。</p>
+<h3 id="对于线程和进程，我们可以这么理解："><a href="#对于线程和进程，我们可以这么理解：" class="headerlink" title="对于线程和进程，我们可以这么理解："></a>对于线程和进程，我们可以这么理解：</h3><p>当进程只有一个线程时，可以认为进程就等于线程；<br>当进程拥有多个线程时，这些线程会共享相同的虚拟内存和全局变量等资源，这些资源在上下文切换时是不需要修改的；<br>另外，线程也有自己的私有数据，比如栈和寄存器等，这些在上下文切换时也是需要保存的。</p>
+<h3 id="线程上下文切换的是什么？"><a href="#线程上下文切换的是什么？" class="headerlink" title="线程上下文切换的是什么？"></a>线程上下文切换的是什么？</h3><p>这还得看线程是不是属于同一个进程：</p>
+<p>当两个线程不是属于同一个进程，则切换的过程就跟进程上下文切换一样；<br>当两个线程是属于同一个进程，因为虚拟内存是共享的，所以在切换时，虚拟内存这些资源就保持不动，只需要切换线程的私有数据、寄存器等不共享的数据；<br>所以，线程的上下文切换相比进程，开销要小很多。</p>
+<h3 id="线程的实现"><a href="#线程的实现" class="headerlink" title="线程的实现"></a>线程的实现</h3><h4 id="主要有三种线程的实现方式："><a href="#主要有三种线程的实现方式：" class="headerlink" title="主要有三种线程的实现方式："></a>主要有三种线程的实现方式：</h4><p>用户线程（User Thread）：在用户空间实现的线程，不是由内核管理的线程，是由用户态的线程库来完成线程的管理；<br>内核线程（Kernel Thread）：在内核中实现的线程，是由内核管理的线程；<br>轻量级进程（LightWeight Process）：在内核中来支持用户线程；<br>那么，这还需要考虑一个问题，用户线程和内核线程的对应关系。</p>
+<p>首先，第一种关系是多对一的关系，也就是多个用户线程对应同一个内核线程：</p>
+<p><img src="https://qingtong-1251156042.cos.ap-beijing.myqcloud.com/scxdoc/2020-09-27-060015.jpg"></p>
+<p>第二种是一对一的关系，也就是一个用户线程对应一个内核线程：</p>
+<p><img src="https://qingtong-1251156042.cos.ap-beijing.myqcloud.com/scxdoc/2020-09-27-060031.jpg"></p>
+<p>第三种是多对多的关系，也就是多个用户线程对应到多个内核线程：</p>
+<p><img src="https://qingtong-1251156042.cos.ap-beijing.myqcloud.com/scxdoc/2020-09-27-060043.jpg"></p>
+<p>用户线程如何理解？存在什么优势和缺陷？<br>用户线程是基于用户态的线程管理库来实现的，那么线程控制块（Thread Control Block, TCB） 也是在库里面来实现的，对于操作系统而言是看不到这个 TCB 的，它只能看到整个进程的 PCB。</p>
+<p>所以，用户线程的整个线程管理和调度，操作系统是不直接参与的，而是由用户级线程库函数来完成线程的管理，包括线程的创建、终止、同步和调度等。</p>
+<p>用户级线程的模型，也就类似前面提到的多对一的关系，即多个用户线程对应同一个内核线程，如下图所示：</p>
+<p><img src="https://qingtong-1251156042.cos.ap-beijing.myqcloud.com/scxdoc/2020-09-27-060057.jpg"></p>
+<h3 id="用户线程的优点："><a href="#用户线程的优点：" class="headerlink" title="用户线程的优点："></a>用户线程的优点：</h3><p>每个进程都需要有它私有的线程控制块（TCB）列表，用来跟踪记录它各个线程状态信息（PC、栈指针、寄存器），TCB 由用户级线程库函数来维护，可用于不支持线程技术的操作系统；<br>用户线程的切换也是由线程库函数来完成的，无需用户态与内核态的切换，所以速度特别快；</p>
+<h3 id="用户线程的缺点："><a href="#用户线程的缺点：" class="headerlink" title="用户线程的缺点："></a>用户线程的缺点：</h3><p>由于操作系统不参与线程的调度，如果一个线程发起了系统调用而阻塞，那进程所包含的用户线程都不能执行了。<br>当一个线程开始运行后，除非它主动地交出 CPU 的使用权，否则它所在的进程当中的其他线程无法运行，因为用户态的线程没法打断当前运行中的线程，它没有这个特权，只有操作系统才有，但是用户线程不是由操作系统管理的。<br>由于时间片分配给进程，故与其他进程比，在多线程执行时，每个线程得到的时间片较少，执行会比较慢；<br>以上，就是用户线程的优缺点了。</p>
+<h3 id="那内核线程如何理解？存在什么优势和缺陷？"><a href="#那内核线程如何理解？存在什么优势和缺陷？" class="headerlink" title="那内核线程如何理解？存在什么优势和缺陷？"></a>那内核线程如何理解？存在什么优势和缺陷？</h3><p>内核线程是由操作系统管理的，线程对应的 TCB 自然是放在操作系统里的，这样线程的创建、终止和管理都是由操作系统负责。</p>
+<p>内核线程的模型，也就类似前面提到的一对一的关系，即一个用户线程对应一个内核线程，如下图所示：</p>
+<p><img src="https://qingtong-1251156042.cos.ap-beijing.myqcloud.com/scxdoc/2020-09-27-060114.jpg"></p>
+<h3 id="内核线程的优点："><a href="#内核线程的优点：" class="headerlink" title="内核线程的优点："></a>内核线程的优点：</h3><p>在一个进程当中，如果某个内核线程发起系统调用而被阻塞，并不会影响其他内核线程的运行；<br>分配给线程，多线程的进程获得更多的 CPU 运行时间；<br>内核线程的缺点：</p>
+<p>在支持内核线程的操作系统中，由内核来维护进程和线程的上下问信息，如 PCB 和 TCB；<br>线程的创建、终止和切换都是通过系统调用的方式来进行，因此对于系统来说，系统开销比较大；<br>以上，就是内核线的优缺点了。</p>
+<h3 id="最后的轻量级进程如何理解？"><a href="#最后的轻量级进程如何理解？" class="headerlink" title="最后的轻量级进程如何理解？"></a>最后的轻量级进程如何理解？</h3><p>轻量级进程（Light-weight process，LWP）是内核支持的用户线程，一个进程可有一个或多个 LWP，每个 LWP 是跟内核线程一对一映射的，也就是 LWP 都是由一个内核线程支持。</p>
+<p>另外，LWP 只能由内核管理并像普通进程一样被调度，Linux 内核是支持 LWP 的典型例子。</p>
+<p>在大多数系统中，LWP与普通进程的区别也在于它只有一个最小的执行上下文和调度程序所需的统计信息。一般来说，一个进程代表程序的一个实例，而 LWP 代表程序的执行线程，因为一个执行线程不像进程那样需要那么多状态信息，所以 LWP 也不带有这样的信息。</p>
+<h3 id="在-LWP-之上也是可以使用用户线程的，那么-LWP-与用户线程的对应关系就有三种："><a href="#在-LWP-之上也是可以使用用户线程的，那么-LWP-与用户线程的对应关系就有三种：" class="headerlink" title="在 LWP 之上也是可以使用用户线程的，那么 LWP 与用户线程的对应关系就有三种："></a>在 LWP 之上也是可以使用用户线程的，那么 LWP 与用户线程的对应关系就有三种：</h3><p>1 : 1，即一个 LWP 对应 一个用户线程；<br>N : 1，即一个 LWP 对应多个用户线程；<br>N : N，即多个 LMP 对应多个用户线程；<br>接下来针对上面这三种对应关系说明它们优缺点。先下图的 LWP 模型：</p>
+<p><img src="https://qingtong-1251156042.cos.ap-beijing.myqcloud.com/scxdoc/2020-09-27-060131.jpg"></p>
+<h4 id="1-1-模式"><a href="#1-1-模式" class="headerlink" title="1 : 1 模式"></a>1 : 1 模式</h4><p>一个线程对应到一个 LWP 再对应到一个内核线程，如上图的进程 4，属于此模型。</p>
+<p>优点：实现并行，当一个 LWP 阻塞，不会影响其他 LWP；<br>缺点：每一个用户线程，就产生一个内核线程，创建线程的开销较大。</p>
+<h4 id="N-1-模式"><a href="#N-1-模式" class="headerlink" title="N : 1 模式"></a>N : 1 模式</h4><p>多个用户线程对应一个 LWP 再对应一个内核线程，如上图的进程 2，线程管理是在用户空间完成的，此模式中用户的线程对操作系统不可见。</p>
+<p>优点：用户线程要开几个都没问题，且上下文切换发生用户空间，切换的效率较高；<br>缺点：一个用户线程如果阻塞了，则整个进程都将会阻塞，另外在多核 CPU  中，是没办法充分利用 CPU 的。</p>
+<h4 id="M-N-模式"><a href="#M-N-模式" class="headerlink" title="M : N 模式"></a>M : N 模式</h4><p>根据前面的两个模型混搭一起，就形成 M:N 模型，该模型提供了两级控制，首先多个用户线程对应到多个 LWP，LWP 再一一对应到内核线程，如上图的进程 3。</p>
+<p>优点：综合了前两种优点，大部分的线程上下文发生在用户空间，且多个线程又可以充分利用多核 CPU 的资源。</p>
+<h4 id="组合模式"><a href="#组合模式" class="headerlink" title="组合模式"></a>组合模式</h4><p>如上图的进程 5，此进程结合 1:1 模型和 M:N 模型。开发人员可以针对不同的应用特点调节内核线程的数目来达到物理并行性和逻辑并行性的最佳方案。</p>
+<h2 id="调度"><a href="#调度" class="headerlink" title="调度"></a>调度</h2><p>进程都希望自己能够占用 CPU 进行工作，那么这涉及到前面说过的进程上下文切换。</p>
+<p>一旦操作系统把进程切换到运行状态，也就意味着该进程占用着 CPU 在执行，但是当操作系统把进程切换到其他状态时，那就不能在 CPU 中执行了，于是操作系统会选择下一个要运行的进程。</p>
+<p>选择一个进程运行这一功能是在操作系统中完成的，通常称为调度程序（scheduler）。</p>
+<p>那到底什么时候调度进程，或以什么原则来调度进程呢？</p>
+<p>调度时机</p>
+<p>在进程的生命周期中，当进程从一个运行状态到另外一状态变化的时候，其实会触发一次调度。</p>
+<h3 id="比如，以下状态的变化都会触发操作系统的调度："><a href="#比如，以下状态的变化都会触发操作系统的调度：" class="headerlink" title="比如，以下状态的变化都会触发操作系统的调度："></a>比如，以下状态的变化都会触发操作系统的调度：</h3><p>从就绪态 -&gt; 运行态：当进程被创建时，会进入到就绪队列，操作系统会从就绪队列选择一个进程运行；<br>从运行态 -&gt; 阻塞态：当进程发生 I/O 事件而阻塞时，操作系统必须另外一个进程运行；<br>从运行态 -&gt; 结束态：当进程退出结束后，操作系统得从就绪队列选择另外一个进程运行；<br>因为，这些状态变化的时候，操作系统需要考虑是否要让新的进程给 CPU 运行，或者是否让当前进程从 CPU 上退出来而换另一个进程运行。</p>
+<h3 id="另外，如果硬件时钟提供某个频率的周期性中断，那么可以根据如何处理时钟中断，把调度算法分为两类："><a href="#另外，如果硬件时钟提供某个频率的周期性中断，那么可以根据如何处理时钟中断，把调度算法分为两类：" class="headerlink" title="另外，如果硬件时钟提供某个频率的周期性中断，那么可以根据如何处理时钟中断，把调度算法分为两类："></a>另外，如果硬件时钟提供某个频率的周期性中断，那么可以根据如何处理时钟中断，把调度算法分为两类：</h3><p>非抢占式调度算法挑选一个进程，然后让该进程运行直到被阻塞，或者直到该进程退出，才会调用另外一个进程，也就是说不会理时钟中断这个事情。<br>抢占式调度算法挑选一个进程，然后让该进程只运行某段时间，如果在该时段结束时，该进程仍然在运行时，则会把它挂起，接着调度程序从就绪队列挑选另外一个进程。这种抢占式调度处理，需要在时间间隔的末端发生时钟中断，以便把 CPU 控制返回给调度程序进行调度，也就是常说的时间片机制。</p>
+<h3 id="调度原则"><a href="#调度原则" class="headerlink" title="调度原则"></a>调度原则</h3><p>原则一：如果运行的程序，发生了 I/O 事件的请求，那 CPU 使用率必然会很低，因为此时进程在阻塞等待硬盘的数据返回。这样的过程，势必会造成 CPU 突然的空闲。所以，为了提高 CPU 利用率，在这种发送 I/O 事件致使 CPU 空闲的情况下，调度程序需要从就绪队列中选择一个进程来运行。</p>
+<p>原则二：有的程序执行某个任务花费的时间会比较长，如果这个程序一直占用着 CPU，会造成系统吞吐量（CPU 在单位时间内完成的进程数量）的降低。所以，要提高系统的吞吐率，调度程序要权衡长任务和短任务进程的运行完成数量。</p>
+<p>原则三：从进程开始到结束的过程中，实际上是包含两个时间，分别是进程运行时间和进程等待时间，这两个时间总和就称为周转时间。进程的周转时间越小越好，如果进程的等待时间很长而运行时间很短，那周转时间就很长，这不是我们所期望的，调度程序应该避免这种情况发生。</p>
+<p>原则四：处于就绪队列的进程，也不能等太久，当然希望这个等待的时间越短越好，这样可以使得进程更快的在 CPU 中执行。所以，就绪队列中进程的等待时间也是调度程序所需要考虑的原则。</p>
+<p>原则五：对于鼠标、键盘这种交互式比较强的应用，我们当然希望它的响应时间越快越好，否则就会影响用户体验了。所以，对于交互式比较强的应用，响应时间也是调度程序需要考虑的原则。</p>
+<p><img src="https://qingtong-1251156042.cos.ap-beijing.myqcloud.com/scxdoc/2020-09-27-060202.jpg"></p>
+<h3 id="针对上面的五种调度原则，总结成如下："><a href="#针对上面的五种调度原则，总结成如下：" class="headerlink" title="针对上面的五种调度原则，总结成如下："></a>针对上面的五种调度原则，总结成如下：</h3><p>CPU 利用率：调度程序应确保 CPU 是始终匆忙的状态，这可提高 CPU 的利用率；<br>系统吞吐量：吞吐量表示的是单位时间内 CPU 完成进程的数量，长作业的进程会占用较长的 CPU 资源，因此会降低吞吐量，相反，短作业的进程会提升系统吞吐量；<br>周转时间：周转时间是进程运行和阻塞时间总和，一个进程的周转时间越小越好；<br>等待时间：这个等待时间不是阻塞状态的时间，而是进程处于就绪队列的时间，等待的时间越长，用户越不满意；<br>响应时间：用户提交请求到系统第一次产生响应所花费的时间，在交互式系统中，响应时间是衡量调度算法好坏的主要标准。<br>说白了，这么多调度原则，目的就是要使得进程要「快」。</p>
+<h3 id="调度算法"><a href="#调度算法" class="headerlink" title="调度算法"></a>调度算法</h3><p>不同的调度算法适用的场景也是不同的。</p>
+<h3 id="接下来，说说在单核-CPU-系统中常见的调度算法。"><a href="#接下来，说说在单核-CPU-系统中常见的调度算法。" class="headerlink" title="接下来，说说在单核 CPU 系统中常见的调度算法。"></a>接下来，说说在单核 CPU 系统中常见的调度算法。</h3><p>01 先来先服务调度算法<br>最简单的一个调度算法，就是非抢占式的先来先服务（First Come First Severd, FCFS）算法了。</p>
+<p><img src="https://qingtong-1251156042.cos.ap-beijing.myqcloud.com/scxdoc/2020-09-27-060219.jpg"></p>
+<p>顾名思义，先来后到，每次从就绪队列选择最先进入队列的进程，然后一直运行，直到进程退出或被阻塞，才会继续从队列中选择第一个进程接着运行。</p>
+<p>这似乎很公平，但是当一个长作业先运行了，那么后面的短作业等待的时间就会很长，不利于短作业。</p>
+<p>FCFS 对长作业有利，适用于 CPU 繁忙型作业的系统，而不适用于 I/O 繁忙型作业的系统。</p>
+<p>02 最短作业优先调度算法<br>最短作业优先（Shortest Job First, SJF）调度算法同样也是顾名思义，它会优先选择运行时间最短的进程来运行，这有助于提高系统的吞吐量。</p>
+<p><img src="https://qingtong-1251156042.cos.ap-beijing.myqcloud.com/scxdoc/2020-09-27-060233.jpg"></p>
+<p>这显然对长作业不利，很容易造成一种极端现象。</p>
+<p>比如，一个长作业在就绪队列等待运行，而这个就绪队列有非常多的短作业，那么就会使得长作业不断的往后推，周转时间变长，致使长作业长期不会被运行。</p>
+<p>03 高响应比优先调度算法<br>前面的「先来先服务调度算法」和「最短作业优先调度算法」都没有很好的权衡短作业和长作业。</p>
+<p>那么，高响应比优先 （Highest Response Ratio Next, HRRN）调度算法主要是权衡了短作业和长作业。</p>
+<p>每次进行进程调度时，先计算「响应比优先级」，然后把「响应比优先级」最高的进程投入运行，「响应比优先级」的计算公式：</p>
+<p><img src="https://qingtong-1251156042.cos.ap-beijing.myqcloud.com/scxdoc/2020-09-27-060248.jpg"></p>
+<h3 id="从上面的公式，可以发现："><a href="#从上面的公式，可以发现：" class="headerlink" title="从上面的公式，可以发现："></a>从上面的公式，可以发现：</h3><p>如果两个进程的「等待时间」相同时，「要求的服务时间」越短，「响应比」就越高，这样短作业的进程容易被选中运行；<br>如果两个进程「要求的服务时间」相同时，「等待时间」越长，「响应比」就越高，这就兼顾到了长作业进程，因为进程的响应比可以随时间等待的增加而提高，当其等待时间足够长时，其响应比便可以升到很高，从而获得运行的机会；<br>04 时间片轮转调度算法<br>最古老、最简单、最公平且使用最广的算法就是时间片轮转（Round Robin, RR）调度算法。</p>
+<p><img src="https://qingtong-1251156042.cos.ap-beijing.myqcloud.com/scxdoc/2020-09-27-060303.jpg"></p>
+<p>每个进程被分配一个时间段，称为时间片（Quantum），即允许该进程在该时间段中运行。</p>
+<p>如果时间片用完，进程还在运行，那么将会把此进程从 CPU 释放出来，并把 CPU 分配另外一个进程；<br>如果该进程在时间片结束前阻塞或结束，则 CPU 立即进行切换；<br>另外，时间片的长度就是一个很关键的点：</p>
+<p>如果时间片设得太短会导致过多的进程上下文切换，降低了 CPU 效率；<br>如果设得太长又可能引起对短作业进程的响应时间变长。将<br>通常时间片设为 20ms~50ms 通常是一个比较合理的折中值。</p>
+<p>05 最高优先级调度算法<br>前面的「时间片轮转算法」做了个假设，即让所有的进程同等重要，也不偏袒谁，大家的运行时间都一样。</p>
+<p>但是，对于多用户计算机系统就有不同的看法了，它们希望调度是有优先级的，即希望调度程序能从就绪队列中选择最高优先级的进程进行运行，这称为最高优先级（Highest Priority First，HPF）调度算法。</p>
+<p>进程的优先级可以分为，静态优先级或动态优先级：</p>
+<p>静态优先级：创建进程时候，就已经确定了优先级了，然后整个运行时间优先级都不会变化；<br>动态优先级：根据进程的动态变化调整优先级，比如如果进程运行时间增加，则降低其优先级，如果进程等待时间（就绪队列的等待时间）增加，则升高其优先级，也就是随着时间的推移增加等待进程的优先级。<br>该算法也有两种处理优先级高的方法，非抢占式和抢占式：</p>
+<p>非抢占式：当就绪队列中出现优先级高的进程，运行完当前进程，再选择优先级高的进程。<br>抢占式：当就绪队列中出现优先级高的进程，当前进程挂起，调度优先级高的进程运行。<br>但是依然有缺点，可能会导致低优先级的进程永远不会运行。</p>
+<p>06 多级反馈队列调度算法<br>多级反馈队列（Multilevel Feedback Queue）调度算法是「时间片轮转算法」和「最高优先级算法」的综合和发展。</p>
+<p>顾名思义：</p>
+<p>「多级」表示有多个队列，每个队列优先级从高到低，同时优先级越高时间片越短。<br>「反馈」表示如果有新的进程加入优先级高的队列时，立刻停止当前正在运行的进程，转而去运行优先级高的队列；</p>
+<p><img src="https://qingtong-1251156042.cos.ap-beijing.myqcloud.com/scxdoc/2020-09-27-060322.jpg"></p>
+<p>来看看，它是如何工作的：</p>
+<p>设置了多个队列，赋予每个队列不同的优先级，每个队列优先级从高到低，同时优先级越高时间片越短；<br>新的进程会被放入到第一级队列的末尾，按先来先服务的原则排队等待被调度，如果在第一级队列规定的时间片没运行完成，则将其转入到第二级队列的末尾，以此类推，直至完成；<br>当较高优先级的队列为空，才调度较低优先级的队列中的进程运行。如果进程运行时，有新进程进入较高优先级的队列，则停止当前运行的进程并将其移入到原队列末尾，接着让较高优先级的进程运行；<br>可以发现，对于短作业可能可以在第一级队列很快被处理完。对于长作业，如果在第一级队列处理不完，可以移入下次队列等待被执行，虽然等待的时间变长了，但是运行时间也会更长了，所以该算法很好的兼顾了长短作业，同时有较好的响应时间。</p>
+<p>看的迷迷糊糊？那我拿去银行办业务的例子，把上面的调度算法串起来，你还不懂，你锤我！<br>办理业务的客户相当于进程，银行窗口工作人员相当于 CPU。</p>
+<p>现在，假设这个银行只有一个窗口（单核 CPU ），那么工作人员一次只能处理一个业务。</p>
+<p><img src="https://qingtong-1251156042.cos.ap-beijing.myqcloud.com/scxdoc/2020-09-27-060336.jpg"></p>
+<p>那么最简单的处理方式，就是先来的先处理，后面来的就乖乖排队，这就是先来先服务（FCFS）调度算法。但是万一先来的这位老哥是来贷款的，这一谈就好几个小时，一直占用着窗口，这样后面的人只能干等，或许后面的人只是想简单的取个钱，几分钟就能搞定，却因为前面老哥办长业务而要等几个小时，你说气不气人？</p>
+<p><img src="https://qingtong-1251156042.cos.ap-beijing.myqcloud.com/scxdoc/2020-09-27-060349.jpg"></p>
+<p>有客户抱怨了，那我们就要改进，我们干脆优先给那些几分钟就能搞定的人办理业务，这就是短作业优先（SJF）调度算法。听起来不错，但是依然还是有个极端情况，万一办理短业务的人非常的多，这会导致长业务的人一直得不到服务，万一这个长业务是个大客户，那不就捡了芝麻丢了西瓜</p>
+<p><img src="https://qingtong-1251156042.cos.ap-beijing.myqcloud.com/scxdoc/2020-09-27-060403.jpg"></p>
+<p>那就公平起见，现在窗口工作人员规定，每个人我只处理 10 分钟。如果 10 分钟之内处理完，就马上换下一个人。如果没处理完，依然换下一个人，但是客户自己得记住办理到哪个步骤了。这个也就是时间片轮转（RR）调度算法。但是如果时间片设置过短，那么就会造成大量的上下文切换，增大了系统开销。如果时间片过长，相当于退化成退化成 FCFS 算法了。</p>
+<p><img src="https://qingtong-1251156042.cos.ap-beijing.myqcloud.com/scxdoc/2020-09-27-060415.jpg"></p>
+<p>既然公平也可能存在问题，那银行就对客户分等级，分为普通客户、VIP 客户、SVIP 客户。只要高优先级的客户一来，就第一时间处理这个客户，这就是最高优先级（HPF）调度算法。但依然也会有极端的问题，万一当天来的全是高级客户，那普通客户不是没有被服务的机会，不把普通客户当人是吗？那我们把优先级改成动态的，如果客户办理业务时间增加，则降低其优先级，如果客户等待时间增加，则升高其优先级。</p>
+<p><img src="https://qingtong-1251156042.cos.ap-beijing.myqcloud.com/scxdoc/2020-09-27-060430.jpg"></p>
+<p>那有没有兼顾到公平和效率的方式呢？这里介绍一种算法，考虑的还算充分的，多级反馈队列（MFQ）调度算法，它是时间片轮转算法和优先级算法的综合和发展。它的工作方式：</p>
+<p><img src="https://qingtong-1251156042.cos.ap-beijing.myqcloud.com/scxdoc/2020-09-27-060443.jpg"></p>
+<p>银行设置了多个排队（就绪）队列，每个队列都有不同的优先级，各个队列优先级从高到低，同时每个队列执行时间片的长度也不同，优先级越高的时间片越短。<br>新客户（进程）来了，先进入第一级队列的末尾，按先来先服务原则排队等待被叫号（运行）。如果时间片用完客户的业务还没办理完成，则让客户进入到下一级队列的末尾，以此类推，直至客户业务办理完成。<br>当第一级队列没人排队时，就会叫号二级队列的客户。如果客户办理业务过程中，有新的客户加入到较高优先级的队列，那么此时办理中的客户需要停止办理，回到原队列的末尾等待再次叫号，因为要把窗口让给刚进入较高优先级队列的客户。<br>可以发现，对于要办理短业务的客户来说，可以很快的轮到并解决。对于要办理长业务的客户，一下子解决不了，就可以放到下一个队列，虽然等待的时间稍微变长了，但是轮到自己的办理时间也变长了，也可以接受，不会造成极端的现象，可以说是综合上面几种算法的优点。</p>
+<h2 id="搬运"><a href="#搬运" class="headerlink" title="搬运"></a>搬运</h2><p><a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/eRxhGHQ2ZSCIsYJ6g0h4ig">传送门</a></p>
+
+                
+            </div>
+            <hr/>
+
+            
+
+    <div class="reprint" id="reprint-statement">
+        
+            <div class="reprint__author">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-user">
+                        Author:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    <a href="/about" rel="external nofollow noreferrer">杜宏飞</a>
+                </span>
+            </div>
+            <div class="reprint__type">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-link">
+                        Link:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    <a href="http://D1735489349.github.io/2020/09/27/blogSample/xiancheng_jincheng_20200927/">http://D1735489349.github.io/2020/09/27/blogSample/xiancheng_jincheng_20200927/</a>
+                </span>
+            </div>
+            <div class="reprint__notice">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-copyright">
+                        Reprint policy:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    All articles in this blog are used except for special statements
+                    <a href="https://creativecommons.org/licenses/by/4.0/deed.zh" rel="external nofollow noreferrer" target="_blank">CC BY 4.0</a>
+                    reprint policy. If reproduced, please indicate source
+                    <a href="/about" target="_blank">杜宏飞</a>
+                    !
+                </span>
+            </div>
+        
+    </div>
+
+    <script async defer>
+      document.addEventListener("copy", function (e) {
+        let toastHTML = '<span>Copied successfully, please follow the reprint policy of this article</span><button class="btn-flat toast-action" onclick="navToReprintStatement()" style="font-size: smaller">more</a>';
+        M.toast({html: toastHTML})
+      });
+
+      function navToReprintStatement() {
+        $("html, body").animate({scrollTop: $("#reprint-statement").offset().top - 80}, 800);
+      }
+    </script>
+
+
+
+            <div class="tag_share" style="display: block;">
+                <div class="post-meta__tag-list" style="display: inline-block;">
+                    
+                        <div class="article-tag">
+                            
+                                <a href="/tags/%E7%BA%BF%E7%A8%8B/">
+                                    <span class="chip bg-color">线程</span>
+                                </a>
+                            
+                                <a href="/tags/%E8%BF%9B%E7%A8%8B/">
+                                    <span class="chip bg-color">进程</span>
+                                </a>
+                            
+                        </div>
+                    
+                </div>
+                <div class="post_share" style="zoom: 80%; width: fit-content; display: inline-block; float: right; margin: -0.15rem 0;">
+                    <link rel="stylesheet" type="text/css" href="/libs/share/css/share.min.css">
+<div id="article-share">
+
+    
+    <div class="social-share" data-sites="twitter,facebook,google,qq,qzone,wechat,weibo,douban,linkedin" data-wechat-qrcode-helper="<p>微信扫一扫即可分享！</p>"></div>
+    <script src="/libs/share/js/social-share.min.js"></script>
+    
+
+    
+
+</div>
+
+                </div>
+            </div>
+            
+                <style>
+    #reward {
+        margin: 40px 0;
+        text-align: center;
+    }
+
+    #reward .reward-link {
+        font-size: 1.4rem;
+        line-height: 38px;
+    }
+
+    #reward .btn-floating:hover {
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2), 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    #rewardModal {
+        width: 320px;
+        height: 350px;
+    }
+
+    #rewardModal .reward-title {
+        margin: 15px auto;
+        padding-bottom: 5px;
+    }
+
+    #rewardModal .modal-content {
+        padding: 10px;
+    }
+
+    #rewardModal .close {
+        position: absolute;
+        right: 15px;
+        top: 15px;
+        color: rgba(0, 0, 0, 0.5);
+        font-size: 1.3rem;
+        line-height: 20px;
+        cursor: pointer;
+    }
+
+    #rewardModal .close:hover {
+        color: #ef5350;
+        transform: scale(1.3);
+        -moz-transform:scale(1.3);
+        -webkit-transform:scale(1.3);
+        -o-transform:scale(1.3);
+    }
+
+    #rewardModal .reward-tabs {
+        margin: 0 auto;
+        width: 210px;
+    }
+
+    .reward-tabs .tabs {
+        height: 38px;
+        margin: 10px auto;
+        padding-left: 0;
+    }
+
+    .reward-content ul {
+        padding-left: 0 !important;
+    }
+
+    .reward-tabs .tabs .tab {
+        height: 38px;
+        line-height: 38px;
+    }
+
+    .reward-tabs .tab a {
+        color: #fff;
+        background-color: #ccc;
+    }
+
+    .reward-tabs .tab a:hover {
+        background-color: #ccc;
+        color: #fff;
+    }
+
+    .reward-tabs .wechat-tab .active {
+        color: #fff !important;
+        background-color: #22AB38 !important;
+    }
+
+    .reward-tabs .alipay-tab .active {
+        color: #fff !important;
+        background-color: #019FE8 !important;
+    }
+
+    .reward-tabs .reward-img {
+        width: 210px;
+        height: 210px;
+    }
+</style>
+
+<div id="reward">
+    <a href="#rewardModal" class="reward-link modal-trigger btn-floating btn-medium waves-effect waves-light red">赏</a>
+
+    <!-- Modal Structure -->
+    <div id="rewardModal" class="modal">
+        <div class="modal-content">
+            <a class="close modal-close"><i class="fas fa-times"></i></a>
+            <h4 class="reward-title">你的赏识是我前进的动力</h4>
+            <div class="reward-content">
+                <div class="reward-tabs">
+                    <ul class="tabs row">
+                        <li class="tab col s6 alipay-tab waves-effect waves-light"><a href="#alipay">支付宝</a></li>
+                        <li class="tab col s6 wechat-tab waves-effect waves-light"><a href="#wechat">微 信</a></li>
+                    </ul>
+                    <div id="alipay">
+                        <img src="/medias/reward/alipay.jpg" class="reward-img" alt="支付宝打赏二维码">
+                    </div>
+                    <div id="wechat">
+                        <img src="/medias/reward/wechat.png" class="reward-img" alt="微信打赏二维码">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(function () {
+        $('.tabs').tabs();
+    });
+</script>
+
+            
+        </div>
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+<article id="prenext-posts" class="prev-next articles">
+    <div class="row article-row">
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge left-badge text-color">
+                <i class="fas fa-chevron-left"></i>&nbsp;Previous</div>
+            <div class="card">
+                <a href="/2020/09/29/blogSample/20200929/">
+                    <div class="card-image">
+                        
+                        
+                        <img src="/medias/featureimages/23.jpg" class="responsive-img" alt=".git文件夹太大问题及解决方法">
+                        
+                        <span class="card-title">.git文件夹太大问题及解决方法</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            
+                        
+                    </div>
+                    <div class="publish-info">
+                        <span class="publish-date">
+                            <i class="far fa-clock fa-fw icon-date"></i>2020-09-29
+                        </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/git/" class="post-category">
+                                    git
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/git/">
+                        <span class="chip bg-color">git</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge right-badge text-color">
+                Next&nbsp;<i class="fas fa-chevron-right"></i>
+            </div>
+            <div class="card">
+                <a href="/2020/09/26/blogSample/lieshicunch_20200926/">
+                    <div class="card-image">
+                        
+                        
+                        <img src="/medias/featureimages/19.jpg" class="responsive-img" alt="大数据列式存储的精髓：按列缓存打包">
+                        
+                        <span class="card-title">大数据列式存储的精髓：按列缓存打包</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            大数据列式存储的精髓：按列缓存打包,最具代表的大数据文件存储类型，Parquet和ORC
+                        
+                    </div>
+                    <div class="publish-info">
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2020-09-26
+                            </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/presto/" class="post-category">
+                                    presto
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/presto/">
+                        <span class="chip bg-color">presto</span>
+                    </a>
+                    
+                    <a href="/tags/%E5%A4%A7%E6%95%B0%E6%8D%AE%E5%88%97%E5%BC%8F%E5%AD%98%E5%82%A8/">
+                        <span class="chip bg-color">大数据列式存储</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+    </div>
+</article>
+
+</div>
+
+
+
+<!-- 代码块功能依赖 -->
+<script type="text/javascript" src="/libs/codeBlock/codeBlockFuction.js"></script>
+
+<!-- 代码语言 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeLang.js"></script>
+
+
+<!-- 代码块复制 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeCopy.js"></script>
+
+
+<!-- 代码块收缩 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeShrink.js"></script>
+
+
+    </div>
+    <div id="toc-aside" class="expanded col l3 hide-on-med-and-down">
+        <div class="toc-widget card" style="background-color: white;">
+            <div class="toc-title"><i class="far fa-list-alt"></i>&nbsp;&nbsp;TOC</div>
+            <div id="toc-content"></div>
+        </div>
+    </div>
+</div>
+
+<!-- TOC 悬浮按钮. -->
+
+<div id="floating-toc-btn" class="hide-on-med-and-down">
+    <a class="btn-floating btn-large bg-color">
+        <i class="fas fa-list-ul"></i>
+    </a>
+</div>
+
+
+<script src="/libs/tocbot/tocbot.min.js"></script>
+<script>
+    $(function () {
+        tocbot.init({
+            tocSelector: '#toc-content',
+            contentSelector: '#articleContent',
+            headingsOffset: -($(window).height() * 0.4 - 45),
+            collapseDepth: Number('0'),
+            headingSelector: 'h2, h3, h4'
+        });
+
+        // modify the toc link href to support Chinese.
+        let i = 0;
+        let tocHeading = 'toc-heading-';
+        $('#toc-content a').each(function () {
+            $(this).attr('href', '#' + tocHeading + (++i));
+        });
+
+        // modify the heading title id to support Chinese.
+        i = 0;
+        $('#articleContent').children('h2, h3, h4').each(function () {
+            $(this).attr('id', tocHeading + (++i));
+        });
+
+        // Set scroll toc fixed.
+        let tocHeight = parseInt($(window).height() * 0.4 - 64);
+        let $tocWidget = $('.toc-widget');
+        $(window).scroll(function () {
+            let scroll = $(window).scrollTop();
+            /* add post toc fixed. */
+            if (scroll > tocHeight) {
+                $tocWidget.addClass('toc-fixed');
+            } else {
+                $tocWidget.removeClass('toc-fixed');
+            }
+        });
+
+        
+        /* 修复文章卡片 div 的宽度. */
+        let fixPostCardWidth = function (srcId, targetId) {
+            let srcDiv = $('#' + srcId);
+            if (srcDiv.length === 0) {
+                return;
+            }
+
+            let w = srcDiv.width();
+            if (w >= 450) {
+                w = w + 21;
+            } else if (w >= 350 && w < 450) {
+                w = w + 18;
+            } else if (w >= 300 && w < 350) {
+                w = w + 16;
+            } else {
+                w = w + 14;
+            }
+            $('#' + targetId).width(w);
+        };
+
+        // 切换TOC目录展开收缩的相关操作.
+        const expandedClass = 'expanded';
+        let $tocAside = $('#toc-aside');
+        let $mainContent = $('#main-content');
+        $('#floating-toc-btn .btn-floating').click(function () {
+            if ($tocAside.hasClass(expandedClass)) {
+                $tocAside.removeClass(expandedClass).hide();
+                $mainContent.removeClass('l9');
+            } else {
+                $tocAside.addClass(expandedClass).show();
+                $mainContent.addClass('l9');
+            }
+            fixPostCardWidth('artDetail', 'prenext-posts');
+        });
+        
+    });
+</script>
+
+    
+
+</main>
+
+
+
+
+    <footer class="page-footer bg-color">
+    
+        <link rel="stylesheet" href="/libs/aplayer/APlayer.min.css">
+<style>
+    .aplayer .aplayer-lrc p {
+        
+        display: none;
+        
+        font-size: 12px;
+        font-weight: 700;
+        line-height: 16px !important;
+    }
+
+    .aplayer .aplayer-lrc p.aplayer-lrc-current {
+        
+        display: none;
+        
+        font-size: 15px;
+        color: #42b983;
+    }
+
+    
+    .aplayer.aplayer-fixed.aplayer-narrow .aplayer-body {
+        left: -66px !important;
+    }
+
+    .aplayer.aplayer-fixed.aplayer-narrow .aplayer-body:hover {
+        left: 0px !important;
+    }
+
+    
+</style>
+<div class="">
+    
+    <div class="row">
+        <meting-js class="col l8 offset-l2 m10 offset-m1 s12"
+                   server="netease"
+                   type="playlist"
+                   id="503838841"
+                   fixed='true'
+                   autoplay='false'
+                   theme='#42b983'
+                   loop='all'
+                   order='random'
+                   preload='auto'
+                   volume='0.7'
+                   list-folded='true'
+        >
+        </meting-js>
+    </div>
+</div>
+
+<script src="/libs/aplayer/APlayer.min.js"></script>
+<script src="/libs/aplayer/Meting.min.js"></script>
+
+    
+
+    <div class="container row center-align"
+         style="margin-bottom: 0px !important;">
+        <div class="col s12 m8 l8 copy-right">
+            Copyright&nbsp;&copy;
+            
+                <span id="year">2019-2021</span>
+            
+            <a href="/about" target="_blank">杜宏飞</a>
+            |&nbsp;Powered by&nbsp;<a href="https://hexo.io/" target="_blank">Hexo</a>
+            |&nbsp;Theme&nbsp;<a href="https://github.com/blinkfox/hexo-theme-matery" target="_blank">Matery</a>
+            <br>
+            
+            
+            
+                
+            
+            
+                <span id="busuanzi_container_site_pv">
+                &nbsp;|&nbsp;<i class="far fa-eye"></i>&nbsp;Total visits:&nbsp;
+                    <span id="busuanzi_value_site_pv" class="white-color"></span>
+            </span>
+            
+            
+                <span id="busuanzi_container_site_uv">
+                &nbsp;|&nbsp;<i class="fas fa-users"></i>&nbsp;Total visitors:&nbsp;
+                    <span id="busuanzi_value_site_uv" class="white-color"></span>
+            </span>
+            
+            <br>
+
+            <!-- 运行天数提醒. -->
+            
+            <br>
+            
+        </div>
+        <div class="col s12 m4 l4 social-link social-statis">
+    <a href="https://github.com/blinkfox" class="tooltipped" target="_blank" data-tooltip="访问我的GitHub" data-position="top" data-delay="50">
+        <i class="fab fa-github"></i>
+    </a>
+
+
+
+    <a href="mailto:1181062873@qq.com" class="tooltipped" target="_blank" data-tooltip="邮件联系我" data-position="top" data-delay="50">
+        <i class="fas fa-envelope-open"></i>
+    </a>
+
+
+
+
+
+
+
+    <a href="tencent://AddContact/?fromId=50&fromSubId=1&subcmd=all&uin=1181062873" class="tooltipped" target="_blank" data-tooltip="QQ联系我: 1181062873" data-position="top" data-delay="50">
+        <i class="fab fa-qq"></i>
+    </a>
+
+
+
+
+
+
+
+    <a href="/atom.xml" class="tooltipped" target="_blank" data-tooltip="RSS 订阅" data-position="top" data-delay="50">
+        <i class="fas fa-rss"></i>
+    </a>
+
+</div>
+    </div>
+</footer>
+
+<div class="progress-bar"></div>
+
+
+    <!-- 搜索遮罩框 -->
+<div id="searchModal" class="modal">
+    <div class="modal-content">
+        <div class="search-header">
+            <span class="title"><i class="fas fa-search"></i>&nbsp;&nbsp;Search</span>
+            <input type="search" id="searchInput" name="s" placeholder="Please enter a search keyword"
+                   class="search-input">
+        </div>
+        <div id="searchResult"></div>
+    </div>
+</div>
+
+<script type="text/javascript">
+$(function () {
+    var searchFunc = function (path, search_id, content_id) {
+        'use strict';
+        $.ajax({
+            url: path,
+            dataType: "xml",
+            success: function (xmlResponse) {
+                // get the contents from search data
+                var datas = $("entry", xmlResponse).map(function () {
+                    return {
+                        title: $("title", this).text(),
+                        content: $("content", this).text(),
+                        url: $("url", this).text()
+                    };
+                }).get();
+                var $input = document.getElementById(search_id);
+                var $resultContent = document.getElementById(content_id);
+                $input.addEventListener('input', function () {
+                    var str = '<ul class=\"search-result-list\">';
+                    var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+                    $resultContent.innerHTML = "";
+                    if (this.value.trim().length <= 0) {
+                        return;
+                    }
+                    // perform local searching
+                    datas.forEach(function (data) {
+                        var isMatch = true;
+                        var data_title = data.title.trim().toLowerCase();
+                        var data_content = data.content.trim().replace(/<[^>]+>/g, "").toLowerCase();
+                        var data_url = data.url;
+                        data_url = data_url.indexOf('/') === 0 ? data.url : '/' + data_url;
+                        var index_title = -1;
+                        var index_content = -1;
+                        var first_occur = -1;
+                        // only match artiles with not empty titles and contents
+                        if (data_title !== '' && data_content !== '') {
+                            keywords.forEach(function (keyword, i) {
+                                index_title = data_title.indexOf(keyword);
+                                index_content = data_content.indexOf(keyword);
+                                if (index_title < 0 && index_content < 0) {
+                                    isMatch = false;
+                                } else {
+                                    if (index_content < 0) {
+                                        index_content = 0;
+                                    }
+                                    if (i === 0) {
+                                        first_occur = index_content;
+                                    }
+                                }
+                            });
+                        }
+                        // show search results
+                        if (isMatch) {
+                            str += "<li><a href='" + data_url + "' class='search-result-title'>" + data_title + "</a>";
+                            var content = data.content.trim().replace(/<[^>]+>/g, "");
+                            if (first_occur >= 0) {
+                                // cut out 100 characters
+                                var start = first_occur - 20;
+                                var end = first_occur + 80;
+                                if (start < 0) {
+                                    start = 0;
+                                }
+                                if (start === 0) {
+                                    end = 100;
+                                }
+                                if (end > content.length) {
+                                    end = content.length;
+                                }
+                                var match_content = content.substr(start, end);
+                                // highlight all keywords
+                                keywords.forEach(function (keyword) {
+                                    var regS = new RegExp(keyword, "gi");
+                                    match_content = match_content.replace(regS, "<em class=\"search-keyword\">" + keyword + "</em>");
+                                });
+
+                                str += "<p class=\"search-result\">" + match_content + "...</p>"
+                            }
+                            str += "</li>";
+                        }
+                    });
+                    str += "</ul>";
+                    $resultContent.innerHTML = str;
+                });
+            }
+        });
+    };
+
+    searchFunc('/search.xml', 'searchInput', 'searchResult');
+});
+</script>
+
+    <!-- 回到顶部按钮 -->
+<div id="backTop" class="top-scroll">
+    <a class="btn-floating btn-large waves-effect waves-light" href="#!">
+        <i class="fas fa-arrow-up"></i>
+    </a>
+</div>
+
+
+    <script src="/libs/materialize/materialize.min.js"></script>
+    <script src="/libs/masonry/masonry.pkgd.min.js"></script>
+    <script src="/libs/aos/aos.js"></script>
+    <script src="/libs/scrollprogress/scrollProgress.min.js"></script>
+    <script src="/libs/lightGallery/js/lightgallery-all.min.js"></script>
+    <script src="/js/matery.js"></script>
+
+    
+
+    
+
+    <!-- 雪花特效 -->
+    
+
+    <!-- 鼠标星星特效 -->
+    
+
+     
+        <script src="https://ssl.captcha.qq.com/TCaptcha.js"></script>
+        <script src="/libs/others/TencentCaptcha.js"></script>
+        <button id="TencentCaptcha" data-appid="xxxxxxxxxx" data-cbfn="callback" type="button" hidden></button>
+    
+
+    <!-- Baidu Analytics -->
+
+    <!-- Baidu Push -->
+
+<script>
+    (function () {
+        var bp = document.createElement('script');
+        var curProtocol = window.location.protocol.split(':')[0];
+        if (curProtocol === 'https') {
+            bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+        } else {
+            bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+        }
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(bp, s);
+    })();
+</script>
+
+    
+    <script src="/libs/others/clicklove.js" async="async"></script>
+    
+    
+    <script async src="/libs/others/busuanzi.pure.mini.js"></script>
+    
+
+    
+
+    
+
+    <!--腾讯兔小巢-->
+    
+    
+
+    
+
+    
+
+    
+    <script src="/libs/instantpage/instantpage.js" type="module"></script>
+    
+
+</body>
+
+</html>
